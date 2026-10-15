@@ -19,7 +19,7 @@ function Overview() {
   const { apps } = useResources();
   const blocked = events.filter((e) => e.risk >= 70).length;
   const ram = apps.reduce((s, a) => s + a.ram, 0);
-  const next = predictions()[0];
+  const next = predictions()[0]!;
   return (
     <>
       <PageHeader title="Control Center" sub="Your wrapped apps, protected and tuned by local AI." />

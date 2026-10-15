@@ -28,11 +28,11 @@ let seq = 0;
 function makeEvent(): ThreatEvent {
   const type = Math.random() < 0.7 ? "network" : "permission";
   const list = TARGETS[type];
-  const [target, base] = list[Math.floor(Math.random() * list.length)];
+  const [target, base] = list[Math.floor(Math.random() * list.length)]! as readonly [string, number];
   return {
     id: ++seq,
     time: new Date().toLocaleTimeString(),
-    app: APPS[Math.floor(Math.random() * APPS.length)],
+    app: APPS[Math.floor(Math.random() * APPS.length)]!,
     type,
     target,
     risk: Math.max(0, Math.min(100, Math.round(base + (Math.random() - 0.5) * 14))),
@@ -116,7 +116,7 @@ export function predictions() {
   const hour = new Date().getHours();
   const block = Math.floor(hour / 4);
   const day = (new Date().getDay() + 6) % 7;
-  const scores = APPS.map((app) => ({ app, score: USAGE[app][day][Math.min(5, block + 1)] }));
+  const scores = APPS.map((app) => ({ app, score: USAGE[app][day]![Math.min(5, block + 1)] ?? 0 }));
   const total = scores.reduce((s, x) => s + x.score, 0) || 1;
   return scores
     .map((s) => ({ app: s.app, confidence: Math.round((s.score / total) * 100 * 2.2) }))

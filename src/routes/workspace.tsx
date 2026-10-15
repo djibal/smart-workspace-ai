@@ -60,7 +60,7 @@ function Workspace() {
             {DAYS.map((d, di) => (
               <Fragment key={d}>
                 <div className="self-center text-muted-foreground">{d}</div>
-                {USAGE[app][di].map((v, hi) => (
+                {USAGE[app][di]!.map((v, hi) => (
                   <div key={`${d}${hi}`} title={`${v} min`} className="h-9 rounded bg-primary" style={{ opacity: 0.08 + (v / max) * 0.92 }} />
                 ))}
               </Fragment>

@@ -65,7 +65,7 @@ export const askAegis = createServerFn({ method: "POST" })
     return d;
   })
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
     const cfg = SCHEMAS[data.kind];
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
