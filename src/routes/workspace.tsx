@@ -3,17 +3,18 @@ import { Fragment, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/aegis";
+import { PageHeader, AiLockedNotice } from "@/components/aegis";
 import { APPS, USAGE, predictions } from "@/lib/sim";
 import { askAegis } from "@/lib/ai.functions";
+import { useAiAccess } from "@/hooks/use-ai-access";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
     meta: [
       { title: "Workspace · AegisDesk" },
-      { name: "description", content: "AI predicts and pre-loads the apps you use most." },
+      { name: "description", content: "Simulated demo of AI app prediction and pre-loading." },
       { property: "og:title", content: "AegisDesk Automated Workspace" },
-      { property: "og:description", content: "Usage patterns, predictions and AI workspace tips." },
+      { property: "og:description", content: "Sample usage patterns, predictions and AI workspace tips." },
     ],
   }),
   component: Workspace,
@@ -28,6 +29,7 @@ function Workspace() {
   const [tips, setTips] = useState<{ summary: string; tips: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const ask = useServerFn(askAegis);
+  const ai = useAiAccess();
   const max = Math.max(...USAGE[app].flat());
 
   const getTips = async () => {
@@ -46,7 +48,7 @@ function Workspace() {
 
   return (
     <>
-      <PageHeader title="Automated Workspace" sub="AegisDesk learns your rhythm and pre-loads what's next." />
+      <PageHeader title="Automated Workspace" sub="Sample usage patterns showing how AegisDesk would predict your next app." />
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="panel p-5">
           <div className="mb-4 flex flex-wrap gap-1">
@@ -69,13 +71,13 @@ function Workspace() {
         </div>
         <div className="space-y-6">
           <div className="panel p-5">
-            <h2 className="mb-3 font-semibold">Predicted next</h2>
+            <h2 className="mb-3 font-semibold">Predicted next (simulated)</h2>
             <ul className="space-y-3">
               {preds.slice(0, 4).map((p, i) => (
                 <li key={p.app}>
                   <div className="flex justify-between text-sm">
                     <span>{p.app}</span>
-                    <span className="font-mono text-xs text-muted-foreground">{i < 2 ? "pre-loaded" : "queued"} · {p.confidence}%</span>
+                    <span className="font-mono text-xs text-muted-foreground">{i < 2 ? "would pre-load" : "would queue"} · {p.confidence}%</span>
                   </div>
                   <div className="mt-1 h-1.5 rounded bg-secondary"><div className="h-full rounded bg-primary" style={{ width: `${p.confidence}%` }} /></div>
                 </li>
@@ -84,7 +86,8 @@ function Workspace() {
           </div>
           <div className="panel p-5">
             <h2 className="mb-3 font-semibold">Workspace tips</h2>
-            <Button className="w-full" onClick={getTips} disabled={loading}>{loading ? "Thinking…" : "Generate AI tips"}</Button>
+            <Button className="w-full" onClick={getTips} disabled={loading || !ai.allowed}>{loading ? "Thinking…" : "Generate AI tips"}</Button>
+            <AiLockedNotice state={ai.state} />
             {tips && (
               <div className="mt-4 space-y-2 text-sm">
                 <p className="text-muted-foreground">{tips.summary}</p>
