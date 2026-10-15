@@ -4,7 +4,7 @@ import { parseAiResult, validateAiRequest, type AiKind } from "./ai.schemas";
 
 type Kind = AiKind;
 
-const SCHEMAS: Record<Kind, { system: string; schema: Record<string, unknown> }> = {
+const SCHEMAS: Record<Kind, { system: string; schema: Record<string, any> }> = {
   threat: {
     system:
       "You are AegisDesk Threat Shield, a local security analyst for desktop-wrapped web apps. Given one network or permission event, give a short plain-language verdict for a non-technical user.",
@@ -67,7 +67,7 @@ const SCHEMAS: Record<Kind, { system: string; schema: Record<string, unknown> }>
 export const askAegis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => validateAiRequest(d))
-  .handler(async ({ data }): Promise<{ error: string } | { result: Record<string, unknown> }> => {
+  .handler(async ({ data }): Promise<{ error: string } | { result: Record<string, any> }> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
     const cfg = SCHEMAS[data.kind];

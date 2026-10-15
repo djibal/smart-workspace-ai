@@ -93,7 +93,7 @@ export function validateAiRequest(input: unknown): AiRequest {
 }
 
 /** Parse raw model text and validate it; returns null when invalid. */
-export function parseAiResult(kind: AiKind, text: string): Record<string, unknown> | null {
+export function parseAiResult(kind: AiKind, text: string): Record<string, any> | null {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
@@ -101,5 +101,5 @@ export function parseAiResult(kind: AiKind, text: string): Record<string, unknow
     return null;
   }
   const r = aiResultSchemas[kind].safeParse(raw);
-  return r.success ? (r.data as Record<string, unknown>) : null;
+  return r.success ? (r.data as Record<string, any>) : null;
 }

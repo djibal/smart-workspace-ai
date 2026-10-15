@@ -33,7 +33,7 @@ describe("AI request validation", () => {
 describe("AI response validation", () => {
   it("accepts a valid verdict", () => {
     const r = parseAiResult("threat", JSON.stringify({ verdict: "safe", action: "allow", explanation: "ok", confidence: 90 }));
-    expect(r?.verdict).toBe("safe");
+    expect(r?.["verdict"]).toBe("safe");
   });
   it("rejects an unknown verdict", () => {
     expect(parseAiResult("threat", JSON.stringify({ verdict: "fine", action: "allow", explanation: "ok", confidence: 9 }))).toBeNull();
