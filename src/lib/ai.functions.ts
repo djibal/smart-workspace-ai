@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { parseAiResult, validateAiRequest, type AiKind } from "./ai.schemas";
 
-type Kind = "threat" | "workspace" | "resources";
+type Kind = AiKind;
 
 const SCHEMAS: Record<Kind, { system: string; schema: Record<string, unknown> }> = {
   threat: {
@@ -59,47 +61,57 @@ const SCHEMAS: Record<Kind, { system: string; schema: Record<string, unknown> }>
   },
 };
 
+// Requires a valid signed-in session (verified server-side by requireSupabaseAuth).
+// The user id comes only from the verified token, never from the request body.
+// NOTE: sign-in alone does not limit usage — server-side rate limits/quotas are still needed.
 export const askAegis = createServerFn({ method: "POST" })
-  .inputValidator((d: { kind: Kind; context: unknown }) => {
-    if (!d || !(d.kind in SCHEMAS)) throw new Error("Invalid request");
-    return d;
-  })
-  .handler(async ({ data }) => {
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => validateAiRequest(d))
+  .handler(async ({ data }): Promise<{ error: string } | { result: Record<string, unknown> }> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
     const cfg = SCHEMAS[data.kind];
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
-        "X-Lovable-AIG-SDK": "fetch",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-6-astra",
-        instructions: cfg.system,
-        input: JSON.stringify(data.context).slice(0, 8000),
-        stream: true,
-        store: false,
-        reasoning: { effort: "low", summary: "auto" },
-        include: ["reasoning.encrypted_content"],
-        text: { format: { type: "json_schema", name: "result", strict: true, schema: cfg.schema } },
-      }),
-    });
+    let res: Response;
+    try {
+      res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Lovable-API-Key": apiKey,
+          "X-Lovable-AIG-SDK": "fetch",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-6-astra",
+          instructions: cfg.system,
+          input: JSON.stringify(data.context),
+          stream: true,
+          store: false,
+          reasoning: { effort: "low", summary: "auto" },
+          include: ["reasoning.encrypted_content"],
+          text: { format: { type: "json_schema", name: "result", strict: true, schema: cfg.schema } },
+        }),
+      });
+    } catch (e) {
+      console.error("[askAegis] gateway unreachable", e);
+      return { error: "Couldn't reach the AI service." };
+    }
     if (!res.ok || !res.body) {
+      console.error("[askAegis] gateway status", res.status);
       const msg =
         res.status === 429
           ? "Too many requests — try again in a moment."
           : res.status === 402
             ? "AI credits exhausted. Add credits in Settings → Plans & credits."
-            : `AI request failed (${res.status}).`;
+            : res.status === 403
+              ? "AI access is blocked for this workspace."
+              : "The AI request failed. Please try again later.";
       return { error: msg };
     }
     const reader = res.body.getReader();
     const dec = new TextDecoder();
     let buf = "";
     let text = "";
-    let failed: string | null = null;
+    let failed = false;
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -112,18 +124,18 @@ export const askAegis = createServerFn({ method: "POST" })
         if (!payload || payload === "[DONE]") continue;
         try {
           const ev = JSON.parse(payload);
-          if (ev.type === "response.output_text.delta") text += ev.delta;
-          if (ev.type === "response.failed" || ev.type === "error")
-            failed = ev.response?.error?.message ?? ev.message ?? "AI failed.";
+          if (ev.type === "response.output_text.delta" && typeof ev.delta === "string") text += ev.delta;
+          if (ev.type === "response.failed" || ev.type === "error") {
+            console.error("[askAegis] stream failure", ev.response?.error ?? ev.message);
+            failed = true;
+          }
         } catch {
-          /* ignore */
+          /* ignore partial frames */
         }
       }
     }
-    if (failed) return { error: failed };
-    try {
-      return { result: JSON.parse(text) as Record<string, any> };
-    } catch {
-      return { error: "AI returned no answer." };
-    }
+    if (failed) return { error: "The AI could not complete this request." };
+    const result = parseAiResult(data.kind, text);
+    if (!result) return { error: "The AI returned an unexpected answer." };
+    return { result };
   });
