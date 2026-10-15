@@ -14,9 +14,9 @@ export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
       { title: "Resources · AegisDesk" },
-      { name: "description", content: "Dynamic per-app CPU and RAM limits tuned by AI." },
+      { name: "description", content: "Simulated demo of per-app CPU and RAM limits suggested by AI." },
       { property: "og:title", content: "AegisDesk Intelligent Resource Allocation" },
-      { property: "og:description", content: "Live CPU/RAM per app with AI-suggested limits." },
+      { property: "og:description", content: "Sample CPU/RAM per app with AI-suggested limits." },
     ],
   }),
   component: Resources,
