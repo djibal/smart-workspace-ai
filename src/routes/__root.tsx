@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -78,20 +80,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "AegisDesk Control Center" },
+      { name: "description", content: "AegisDesk demo: AI threat intelligence, workspace prediction and resource allocation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -115,13 +112,56 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const NAV = [
+  { to: "/", label: "Overview", icon: LayoutGrid },
+  { to: "/threats", label: "Threat Intelligence", icon: ShieldAlert },
+  { to: "/workspace", label: "Workspace", icon: Sparkle },
+  { to: "/resources", label: "Resources", icon: Cpu },
+] as const;
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen">
+        <aside className="hidden w-60 shrink-0 border-r bg-card/50 p-4 md:block">
+          <div className="mb-8 flex items-center gap-2 px-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <span className="text-lg font-bold tracking-tight">AegisDesk</span>
+          </div>
+          <nav className="space-y-1">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                activeOptions={{ exact: true }}
+                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                activeProps={{ className: "bg-accent text-accent-foreground" }}
+              >
+                <n.icon className="h-4 w-4" />
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+          <p className="mt-10 px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Demo · simulated data
+          </p>
+        </aside>
+        <div className="flex-1">
+          <nav className="flex gap-1 overflow-x-auto border-b p-2 md:hidden">
+            {NAV.map((n) => (
+              <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="whitespace-nowrap rounded px-3 py-1.5 text-sm text-muted-foreground" activeProps={{ className: "bg-accent text-accent-foreground" }}>
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+          <main className="mx-auto max-w-6xl p-6 md:p-10">
+            <Outlet />
+          </main>
+        </div>
+      </div>
+      <Toaster theme="dark" />
     </QueryClientProvider>
   );
 }
