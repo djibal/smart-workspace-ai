@@ -9,104 +9,153 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as ThreatsRouteImport } from './routes/threats'
-import { Route as WorkspaceRouteImport } from './routes/workspace'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedThreatsRouteImport } from './routes/_authenticated/threats'
+import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ResourcesRoute = ResourcesRouteImport.update({
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ThreatsRoute = ThreatsRouteImport.update({
+const AuthenticatedThreatsRoute = AuthenticatedThreatsRouteImport.update({
   id: '/threats',
   path: '/threats',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const WorkspaceRoute = WorkspaceRouteImport.update({
+const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
   id: '/workspace',
   path: '/workspace',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/resources': typeof ResourcesRoute
-  '/threats': typeof ThreatsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/threats': typeof AuthenticatedThreatsRoute
+  '/workspace': typeof AuthenticatedWorkspaceRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/resources': typeof ResourcesRoute
-  '/threats': typeof ThreatsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/auth': typeof AuthRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/threats': typeof AuthenticatedThreatsRoute
+  '/workspace': typeof AuthenticatedWorkspaceRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/resources': typeof ResourcesRoute
-  '/threats': typeof ThreatsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/resources': typeof AuthenticatedResourcesRoute
+  '/_authenticated/threats': typeof AuthenticatedThreatsRoute
+  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/resources' | '/threats' | '/workspace'
+  fullPaths: '/' | '/auth' | '/resources' | '/threats' | '/workspace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/resources' | '/threats' | '/workspace'
-  id: '__root__' | '/' | '/resources' | '/threats' | '/workspace'
+  to: '/auth' | '/resources' | '/threats' | '/workspace' | '/'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/resources'
+    | '/_authenticated/threats'
+    | '/_authenticated/workspace'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ResourcesRoute: typeof ResourcesRoute
-  ThreatsRoute: typeof ThreatsRoute
-  WorkspaceRoute: typeof WorkspaceRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/resources': {
-      id: '/resources'
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
       path: '/resources'
       fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/threats': {
-      id: '/threats'
+    '/_authenticated/threats': {
+      id: '/_authenticated/threats'
       path: '/threats'
       fullPath: '/threats'
-      preLoaderRoute: typeof ThreatsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedThreatsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/workspace': {
-      id: '/workspace'
+    '/_authenticated/workspace': {
+      id: '/_authenticated/workspace'
       path: '/workspace'
       fullPath: '/workspace'
-      preLoaderRoute: typeof WorkspaceRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
+  AuthenticatedThreatsRoute: typeof AuthenticatedThreatsRoute
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
+  AuthenticatedThreatsRoute: AuthenticatedThreatsRoute,
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ResourcesRoute: ResourcesRoute,
-  ThreatsRoute: ThreatsRoute,
-  WorkspaceRoute: WorkspaceRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

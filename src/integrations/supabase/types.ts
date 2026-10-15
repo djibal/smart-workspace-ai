@@ -14,13 +14,64 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_requests: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          kind: string
+          status: string
+          usage_day: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          kind: string
+          status?: string
+          usage_day: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          kind?: string
+          status?: string
+          usage_day?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_usage_daily: {
+        Row: {
+          usage_day: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          usage_day: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          usage_day?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      finish_ai_request: {
+        Args: { _id: string; _ok: boolean }
+        Returns: undefined
+      }
+      reserve_ai_request: { Args: { _kind: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

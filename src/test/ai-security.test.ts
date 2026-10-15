@@ -53,3 +53,21 @@ describe("AI server function", () => {
     expect(src).toMatch(/\.middleware\(\[requireSupabaseAuth\]\)\s*\.inputValidator/);
   });
 });
+
+describe("AI daily quota", () => {
+  const sql = readFileSync("drizzle/migrations/0000_ai_quota.sql", "utf8");
+  it("caps each user at 20 AI requests per UTC day", () => {
+    expect(sql).toMatch(/_limit constant integer := 20/);
+    expect(sql).toMatch(/now\(\) AT TIME ZONE 'utc'/);
+  });
+  it("reserves atomically with a conditional update", () => {
+    expect(sql).toMatch(/SET used = used \+ 1\s+WHERE user_id = _uid AND usage_day = _day AND used < _limit/);
+  });
+  it("only the server can finalize or refund a reservation", () => {
+    expect(sql).toMatch(/REVOKE ALL ON FUNCTION public\.finish_ai_request\(uuid, boolean\) FROM PUBLIC, anon, authenticated/);
+  });
+  it("reserves quota before calling the AI gateway", () => {
+    const src = readFileSync("src/lib/ai.functions.ts", "utf8");
+    expect(src.indexOf("reserve_ai_request")).toBeLessThan(src.indexOf("callGateway(apiKey"));
+  });
+});

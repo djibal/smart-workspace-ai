@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, Stat, RiskBadge } from "@/components/aegis";
 import { useThreatFeed, useResources, predictions } from "@/lib/sim";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Overview · AegisDesk Control Center" },
