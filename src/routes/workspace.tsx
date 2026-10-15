@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -58,12 +58,12 @@ function Workspace() {
             <div />
             {BLOCKS.map((b) => <div key={b} className="text-center font-mono text-muted-foreground">{b}</div>)}
             {DAYS.map((d, di) => (
-              <>
-                <div key={d} className="self-center text-muted-foreground">{d}</div>
+              <Fragment key={d}>
+                <div className="self-center text-muted-foreground">{d}</div>
                 {USAGE[app][di].map((v, hi) => (
                   <div key={`${d}${hi}`} title={`${v} min`} className="h-9 rounded bg-primary" style={{ opacity: 0.08 + (v / max) * 0.92 }} />
                 ))}
-              </>
+              </Fragment>
             ))}
           </div>
         </div>
