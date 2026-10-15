@@ -9,7 +9,7 @@ import { askAegis } from "@/lib/ai.functions";
 import { useAiAccess } from "@/hooks/use-ai-access";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/threats")({
+export const Route = createFileRoute("/_authenticated/threats")({
   head: () => ({
     meta: [
       { title: "Threat Intelligence · AegisDesk" },

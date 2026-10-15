@@ -8,7 +8,7 @@ import { APPS, USAGE, predictions } from "@/lib/sim";
 import { askAegis } from "@/lib/ai.functions";
 import { useAiAccess } from "@/hooks/use-ai-access";
 
-export const Route = createFileRoute("/workspace")({
+export const Route = createFileRoute("/_authenticated/workspace")({
   head: () => ({
     meta: [
       { title: "Workspace · AegisDesk" },

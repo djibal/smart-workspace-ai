@@ -10,7 +10,7 @@ import { useResources, type AppName } from "@/lib/sim";
 import { askAegis } from "@/lib/ai.functions";
 import { useAiAccess } from "@/hooks/use-ai-access";
 
-export const Route = createFileRoute("/resources")({
+export const Route = createFileRoute("/_authenticated/resources")({
   head: () => ({
     meta: [
       { title: "Resources · AegisDesk" },
