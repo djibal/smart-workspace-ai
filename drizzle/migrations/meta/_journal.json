@@ -8,6 +8,13 @@
       "when": 1792102302792,
       "tag": "0000_ai_quota",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792102406691,
+      "tag": "0001_ai_quota_lockdown",
+      "breakpoints": true
     }
   ]
 }
