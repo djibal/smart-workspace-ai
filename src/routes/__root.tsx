@@ -4,6 +4,8 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -13,7 +15,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu } from "lucide-react";
+import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +124,38 @@ const NAV = [
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const navigate = useNavigate();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      if (event === "SIGNED_IN") {
+        const next = sessionStorage.getItem("aegis-after-login");
+        if (next) {
+          sessionStorage.removeItem("aegis-after-login");
+          if (next.startsWith("/") && !next.startsWith("//")) navigate({ to: next });
+        }
+        queryClient.invalidateQueries();
+      }
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
+        navigate({ to: "/auth" });
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, [router, navigate, queryClient]);
+  const signOut = () => supabase.auth.signOut();
+
+  if (path === "/auth") {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <main className="mx-auto max-w-6xl p-6"><Outlet /></main>
+        <Toaster theme="dark" />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -147,6 +182,9 @@ function RootComponent() {
           <p className="mt-10 px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             Demo · simulated data
           </p>
+          <button onClick={signOut} className="mt-4 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground">
+            <LogOut className="h-4 w-4" aria-hidden="true" /> Sign out
+          </button>
         </aside>
         <div className="flex-1">
           <nav className="flex gap-1 overflow-x-auto border-b p-2 md:hidden">
@@ -155,6 +193,7 @@ function RootComponent() {
                 {n.label}
               </Link>
             ))}
+            <button onClick={signOut} className="whitespace-nowrap rounded px-3 py-1.5 text-sm text-muted-foreground">Sign out</button>
           </nav>
           <main className="mx-auto max-w-6xl p-6 md:p-10">
             <Outlet />

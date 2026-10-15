@@ -28,7 +28,7 @@ export function AiLockedNotice({ state }: { state: "checking" | "signed-in" | "s
       <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
       {state === "checking"
         ? "Checking sign-in…"
-        : "AI analysis is switched off until sign-in is set up for this dashboard."}
+        : "Sign in to use AI analysis."}
     </p>
   );
 }

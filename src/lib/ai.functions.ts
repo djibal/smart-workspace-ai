@@ -67,9 +67,30 @@ const SCHEMAS: Record<Kind, { system: string; schema: Record<string, any> }> = {
 export const askAegis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => validateAiRequest(d))
-  .handler(async ({ data }): Promise<{ error?: string; result?: Record<string, any> }> => {
+  .handler(async ({ data, context }): Promise<{ error?: string; result?: Record<string, any> }> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
+    // Atomic, database-enforced daily quota (reserved before any gateway call).
+    const { data: q, error: qErr } = await context.supabase.rpc("reserve_ai_request", { _kind: data.kind });
+    const quota = q as { allowed: boolean; used: number; limit: number; id?: string } | null;
+    if (qErr || !quota) {
+      console.error("[askAegis] quota check failed", qErr?.message);
+      return { error: "Couldn't check your AI allowance. Try again later." };
+    }
+    if (!quota.allowed || !quota.id) {
+      return { error: `Daily AI limit reached (${quota.limit} per day). It resets at midnight UTC.` };
+    }
+    const out = await callGateway(apiKey, data);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: fErr } = await supabaseAdmin.rpc("finish_ai_request", { _id: quota.id, _ok: !out.error });
+    if (fErr) console.error("[askAegis] finish failed", fErr.message);
+    return out;
+  });
+
+async function callGateway(
+  apiKey: string,
+  data: ReturnType<typeof validateAiRequest>,
+): Promise<{ error?: string; result?: Record<string, any> }> {
     const cfg = SCHEMAS[data.kind];
     let res: Response;
     try {
@@ -138,4 +159,4 @@ export const askAegis = createServerFn({ method: "POST" })
     const result = parseAiResult(data.kind, text);
     if (!result) return { error: "The AI returned an unexpected answer." };
     return { result };
-  });
+}
