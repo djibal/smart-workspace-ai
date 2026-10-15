@@ -6,9 +6,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Overview · AegisDesk Control Center" },
-      { name: "description", content: "Live overview of AegisDesk threats, predicted apps and resource savings." },
+      { name: "description", content: "Simulated overview of AegisDesk threats, predicted apps and resource use." },
       { property: "og:title", content: "AegisDesk Control Center" },
-      { property: "og:description", content: "AI-driven security and performance for your desktop web apps." },
+      { property: "og:description", content: "Demo with sample data of AegisDesk security and performance features." },
     ],
   }),
   component: Overview,
@@ -22,16 +22,16 @@ function Overview() {
   const next = predictions()[0]!;
   return (
     <>
-      <PageHeader title="Control Center" sub="Your wrapped apps, protected and tuned by local AI." />
+      <PageHeader title="Control Center" sub="A preview of how AegisDesk would protect and tune your apps." />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Apps running" value={apps.filter((a) => a.state !== "suspended").length} />
-        <Stat label="Threats blocked" value={blocked} hint="this session" />
-        <Stat label="Total RAM" value={`${ram} MB`} hint={`≈ ${Math.max(0, 2400 - ram)} MB less than a browser`} />
-        <Stat label="Predicted next" value={next.app} hint={`${next.confidence}% confidence`} />
+        <Stat label="High-risk events" value={blocked} hint="simulated · none actually blocked" />
+        <Stat label="Total RAM" value={`${ram} MB`} hint="simulated figures" />
+        <Stat label="Predicted next" value={next.app} hint={`${next.confidence}% confidence · simulated`} />
       </div>
       <div className="panel mt-6 p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold">Live activity</h2>
+          <h2 className="font-semibold">Sample activity</h2>
           <Link to="/threats" className="text-sm text-primary">Open Threat Intelligence →</Link>
         </div>
         <ul className="divide-y">

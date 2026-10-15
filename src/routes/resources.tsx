@@ -5,17 +5,18 @@ import { toast } from "sonner";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { PageHeader } from "@/components/aegis";
+import { PageHeader, AiLockedNotice } from "@/components/aegis";
 import { useResources, type AppName } from "@/lib/sim";
 import { askAegis } from "@/lib/ai.functions";
+import { useAiAccess } from "@/hooks/use-ai-access";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
       { title: "Resources · AegisDesk" },
-      { name: "description", content: "Dynamic per-app CPU and RAM limits tuned by AI." },
+      { name: "description", content: "Simulated demo of per-app CPU and RAM limits suggested by AI." },
       { property: "og:title", content: "AegisDesk Intelligent Resource Allocation" },
-      { property: "og:description", content: "Live CPU/RAM per app with AI-suggested limits." },
+      { property: "og:description", content: "Sample CPU/RAM per app with AI-suggested limits." },
     ],
   }),
   component: Resources,
@@ -28,6 +29,7 @@ function Resources() {
   const [sugg, setSugg] = useState<{ summary: string; suggestions: Sugg[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const ask = useServerFn(askAegis);
+  const ai = useAiAccess();
 
   const optimise = async () => {
     setLoading(true);
@@ -52,13 +54,13 @@ function Resources() {
       if (apps.some((a) => a.app === s.app))
         update(s.app as AppName, { ramLimit: Math.round(s.ramLimit), cpuLimit: Math.round(s.cpuLimit) });
     });
-    toast.success("New limits applied");
+    toast.success("Simulation only — sample limits updated; no real app was changed");
     setSugg(null);
   };
 
   return (
     <>
-      <PageHeader title="Resource Allocation" sub="Dynamic CPU and RAM limits per app, based on how you use them.">
+      <PageHeader title="Resource Allocation" sub="Sample CPU and RAM figures showing how per-app limits would adjust.">
         <label className="flex items-center gap-3 text-sm">
           <Switch checked={eco} onCheckedChange={setEco} /> Battery / thermal saver
         </label>
@@ -95,7 +97,10 @@ function Resources() {
             <h2 className="font-semibold">AI Optimiser</h2>
             <p className="text-sm text-muted-foreground">Suggests new limits from recent usage.</p>
           </div>
-          <Button onClick={optimise} disabled={loading}>{loading ? "Analysing…" : "Optimise with AI"}</Button>
+          <div className="flex flex-col items-end">
+            <Button onClick={optimise} disabled={loading || !ai.allowed}>{loading ? "Analysing…" : "Optimise with AI"}</Button>
+            <AiLockedNotice state={ai.state} />
+          </div>
         </div>
         {sugg && (
           <div className="mt-4 space-y-3">
