@@ -67,7 +67,7 @@ const SCHEMAS: Record<Kind, { system: string; schema: Record<string, any> }> = {
 export const askAegis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => validateAiRequest(d))
-  .handler(async ({ data }): Promise<{ error: string } | { result: Record<string, any> }> => {
+  .handler(async ({ data }): Promise<{ error?: string; result?: Record<string, any> }> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
     const cfg = SCHEMAS[data.kind];
