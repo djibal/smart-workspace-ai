@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedPlatformsRouteImport } from './routes/_authenticated/platforms'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedThreatsRouteImport } from './routes/_authenticated/threats'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
@@ -28,6 +29,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlatformsRoute = AuthenticatedPlatformsRouteImport.update({
+  id: '/platforms',
+  path: '/platforms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
@@ -49,12 +55,14 @@ const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
   '/workspace': typeof AuthenticatedWorkspaceRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
   '/workspace': typeof AuthenticatedWorkspaceRoute
@@ -64,6 +72,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/platforms': typeof AuthenticatedPlatformsRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/threats': typeof AuthenticatedThreatsRoute
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
@@ -71,13 +80,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/resources' | '/threats' | '/workspace'
+  fullPaths:
+    '/' | '/auth' | '/platforms' | '/resources' | '/threats' | '/workspace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/resources' | '/threats' | '/workspace' | '/'
+  to: '/auth' | '/platforms' | '/resources' | '/threats' | '/workspace' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/platforms'
     | '/_authenticated/resources'
     | '/_authenticated/threats'
     | '/_authenticated/workspace'
@@ -112,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/platforms': {
+      id: '/_authenticated/platforms'
+      path: '/platforms'
+      fullPath: '/platforms'
+      preLoaderRoute: typeof AuthenticatedPlatformsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/resources': {
       id: '/_authenticated/resources'
       path: '/resources'
@@ -137,6 +155,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPlatformsRoute: typeof AuthenticatedPlatformsRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedThreatsRoute: typeof AuthenticatedThreatsRoute
   AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
@@ -144,6 +163,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPlatformsRoute: AuthenticatedPlatformsRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedThreatsRoute: AuthenticatedThreatsRoute,
   AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRoute,
