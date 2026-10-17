@@ -43,12 +43,22 @@ export function riskLevel(r: number) {
   return r >= 70 ? "high" : r >= 35 ? "medium" : "low";
 }
 
+/** Runs `tick` every `ms`, but only while the page is visible, so hidden tabs do no sample-data work. */
+export function startVisibleInterval(tick: () => void, ms: number): () => void {
+  let id: ReturnType<typeof setInterval> | undefined;
+  const start = () => { if (id === undefined && !document.hidden) id = setInterval(tick, ms); };
+  const stop = () => { if (id !== undefined) { clearInterval(id); id = undefined; } };
+  const onVisibility = () => (document.hidden ? stop() : start());
+  document.addEventListener("visibilitychange", onVisibility);
+  start();
+  return () => { stop(); document.removeEventListener("visibilitychange", onVisibility); };
+}
+
 export function useThreatFeed() {
   const [events, setEvents] = useState<ThreatEvent[]>([]);
   useEffect(() => {
     setEvents(Array.from({ length: 8 }, makeEvent));
-    const t = setInterval(() => setEvents((e) => [makeEvent(), ...e].slice(0, 40)), 2200);
-    return () => clearInterval(t);
+    return startVisibleInterval(() => setEvents((e) => [makeEvent(), ...e].slice(0, 40)), 2200);
   }, []);
   return events;
 }
@@ -77,7 +87,7 @@ export function useResources() {
   const [eco, setEco] = useState(false);
   useEffect(() => {
     let t = 0;
-    const id = setInterval(() => {
+    return startVisibleInterval(() => {
       t++;
       setApps((list) =>
         list.map((a) => {
@@ -90,7 +100,6 @@ export function useResources() {
         }),
       );
     }, 1500);
-    return () => clearInterval(id);
   }, [eco]);
   const update = (app: AppName, patch: Partial<AppRes>) =>
     setApps((l) => l.map((a) => (a.app === app ? { ...a, ...patch } : a)));

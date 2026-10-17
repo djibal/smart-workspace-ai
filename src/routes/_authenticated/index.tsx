@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, Stat, RiskBadge } from "@/components/aegis";
@@ -22,7 +23,7 @@ function Overview() {
   const { apps } = useResources();
   const blocked = events.filter((e) => e.risk >= 70).length;
   const ram = apps.reduce((s, a) => s + a.ram, 0);
-  const next = predictions()[0];
+  const next = useMemo(() => predictions()[0], []);
   return (
     <>
       <PageHeader title="Control Center" sub="A preview of how AegisDesk would protect and tune your apps." />
