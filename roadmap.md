@@ -13,3 +13,9 @@
 
 ## Slack lead alerts
 - [ ] Post new lead details to Slack (blocked: app has no lead form yet; awaiting user answer)
+
+## Stage L2.2
+- [x] Refine simulated threat severity, permission guidance, and recoverable feedback.
+- [x] Compact shared Simulation Mode warning and verify keyboard/mobile usability.
+- [x] Run 38 tests; automatic build OK; signed-in Threats verified at 390/820/1280px (separate type-check result unavailable).
+- [x] Deliver implementation report and stop for supervisor review; Slack remains out of scope.

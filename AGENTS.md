@@ -14,3 +14,4 @@
 - Dashboard pages live under `src/routes/_authenticated/` (client-only gate); `/auth` is the only public page — access is private by default, signup is disabled.
 - AI quota is reserved atomically in the database (`reserve_ai_request`) before any gateway call and finalized/refunded only server-side (`finish_ai_request`, service role) — client counters are never trusted and users have read-only access to their own usage rows.
 - Dashboard pages use shared status UI and page boundaries for hydration, route delays and recoverable render failures; sample data stays local and AI request feedback stays inline without changing security or quota logic.
+- Threat presentation uses the client-only threat-display module and existing simulation severity thresholds; recommendation availability is explicitly informational to prevent presentation from implying enforcement.
