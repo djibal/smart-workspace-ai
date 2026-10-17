@@ -80,7 +80,7 @@ function Resources() {
               <span className={`rounded px-2 py-0.5 text-xs uppercase ${a.state === "active" ? "bg-success/15 text-success" : a.state === "idle" ? "bg-warning/20 text-warning" : "bg-secondary text-muted-foreground"}`}>{a.state}</span>
             </div>
             <div className="mt-2 h-16">
-              {a.history.length === 0 ? <p role="status" className="flex h-full items-center justify-center text-xs text-muted-foreground">Waiting for sample chart readings…</p> : <ResponsiveContainer width="100%" height="100%">
+              {a.history.length === 0 ? <p role="status" className="flex h-full items-center justify-center text-xs text-muted-foreground">No sample chart readings available.</p> : <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={a.history}>
                   <YAxis hide domain={[0, 100]} />
                   <Area type="monotone" dataKey="cpu" stroke="var(--chart-1)" fill="var(--chart-1)" fillOpacity={0.15} isAnimationActive={false} />

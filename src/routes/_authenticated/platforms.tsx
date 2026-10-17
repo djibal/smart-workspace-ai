@@ -35,21 +35,21 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 const PLATFORMS: { name: string; icon: typeof Monitor; status: Status; note: string }[] = [
-  { name: "macOS (Apple Silicon)", icon: Apple, status: "experimental", note: "Native source compiles; packaged app not yet verified on real hardware." },
+  { name: "macOS (Apple Silicon)", icon: Apple, status: "experimental", note: "Native macOS application built and launched on Apple Silicon. Installer packaging and security validation remain in progress." },
   { name: "Windows", icon: Monitor, status: "experimental", note: "Native source written; full build and run not yet verified." },
   { name: "Android", icon: Smartphone, status: "planned", note: "Development target only. No Android build exists." },
   { name: "iPhone / iPad", icon: TabletSmartphone, status: "planned", note: "Development target only. No iOS build exists." },
 ];
 
-const FEATURES: { name: string; web: Status; desktop: Status; mobile: Status }[] = [
-  { name: "Web dashboard (this app)", web: "implemented", desktop: "planned", mobile: "implemented" },
-  { name: "AI explanations (signed-in, daily quota)", web: "implemented", desktop: "planned", mobile: "implemented" },
-  { name: "Threat scoring & permission advisor", web: "experimental", desktop: "experimental", mobile: "planned" },
-  { name: "Per-app isolated sessions", web: "unavailable", desktop: "experimental", mobile: "planned" },
-  { name: "HTTPS-only app addresses", web: "unavailable", desktop: "experimental", mobile: "planned" },
-  { name: "Workspace prediction & pre-loading", web: "experimental", desktop: "experimental", mobile: "planned" },
-  { name: "RAM / CPU limits per app", web: "unavailable", desktop: "experimental", mobile: "unavailable" },
-  { name: "Camera & microphone advisor", web: "unavailable", desktop: "experimental", mobile: "planned" },
+const FEATURES: { name: string; web: Status; desktop: Status }[] = [
+  { name: "Web dashboard (this app)", web: "implemented", desktop: "planned" },
+  { name: "AI explanations (signed-in, daily quota)", web: "implemented", desktop: "planned" },
+  { name: "Threat scoring & permission advisor", web: "experimental", desktop: "experimental" },
+  { name: "Per-app isolated sessions", web: "unavailable", desktop: "experimental" },
+  { name: "HTTPS-only app addresses", web: "unavailable", desktop: "experimental" },
+  { name: "Workspace prediction & pre-loading", web: "experimental", desktop: "experimental" },
+  { name: "RAM / CPU limits per app", web: "unavailable", desktop: "experimental" },
+  { name: "Camera & microphone advisor", web: "unavailable", desktop: "experimental" },
 ];
 
 function Pill({ status }: { status: Status }) {
@@ -82,6 +82,15 @@ function Platforms() {
         </div>
       </section>
 
+      <section aria-labelledby="mobile-platforms" className="mb-8">
+        <h2 id="mobile-platforms" className="mb-3 font-semibold">Mobile platforms</h2>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li><span className="font-medium text-foreground">Responsive mobile web interface:</span> implemented.</li>
+          <li><span className="font-medium text-foreground">Native Android application:</span> planned.</li>
+          <li><span className="font-medium text-foreground">Native iOS application:</span> planned.</li>
+        </ul>
+      </section>
+
       <section aria-labelledby="features" className="mb-8">
         <h2 id="features" className="mb-3 font-semibold">Feature status</h2>
         {FEATURES.length === 0 && <DashboardState kind="empty" title="No feature status available" message="No roadmap entries have been provided." />}
@@ -93,7 +102,7 @@ function Platforms() {
                 <th scope="col" className="p-4 font-medium">Feature</th>
                 <th scope="col" className="p-4 font-medium">Web</th>
                 <th scope="col" className="p-4 font-medium">Desktop</th>
-                <th scope="col" className="p-4 font-medium">Mobile</th>
+                <th scope="col" className="p-4 font-medium">Mobile Web</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -102,14 +111,14 @@ function Platforms() {
                   <th scope="row" className="p-4 text-left font-normal">{f.name}</th>
                   <td className="p-4"><Pill status={f.web} /></td>
                   <td className="p-4"><Pill status={f.desktop} /></td>
-                  <td className="p-4"><Pill status={f.mobile} /></td>
+                  <td className="p-4"><Pill status={f.web} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          "Mobile" for the web dashboard means this site in a phone browser — not a native app.
+          Mobile Web is the same browser application on a phone or tablet, not a native Android or iOS app. Experimental web features use sample data.
         </p>
       </section>
 

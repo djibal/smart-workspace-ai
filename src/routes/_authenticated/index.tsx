@@ -28,9 +28,9 @@ function Overview() {
       <PageHeader title="Control Center" sub="A preview of how AegisDesk would protect and tune your apps." />
       {apps.length === 0 && <DashboardState kind="empty" title="No resource data available" message="Sample app figures haven’t been provided." />}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Apps running" value={apps.filter((a) => a.state !== "suspended").length} />
-        <Stat label="High-risk events" value={blocked} hint="simulated · none actually blocked" />
-        <Stat label="Total RAM" value={`${ram} MB`} hint="simulated figures" />
+        <Stat label="Apps running" value={apps.length ? apps.filter((a) => a.state !== "suspended").length : "Unavailable"} />
+        <Stat label="High-risk events" value={events.length ? blocked : "Unavailable"} hint="simulated · none actually blocked" />
+        <Stat label="Total RAM" value={apps.length ? `${ram} MB` : "Unavailable"} hint="simulated figures" />
         <Stat label="Predicted next" value={next?.app ?? "Unavailable"} hint={next ? `${next.confidence}% confidence · simulated` : "No predictions available"} />
       </div>
       <div className="panel mt-6 p-5">
@@ -38,7 +38,7 @@ function Overview() {
           <h2 className="font-semibold">Sample activity</h2>
           <Link to="/threats" className="text-sm text-primary">Open Threat Intelligence →</Link>
         </div>
-        {events.length === 0 && <DashboardState kind="empty" title="No sample activity yet" message="Waiting for sample events. No device monitoring is taking place." />}
+        {events.length === 0 && <DashboardState kind="empty" title="No sample activity yet" message="No sample events are available. This does not indicate that your device is safe or being monitored." />}
         <ul className="divide-y">
           {events.slice(0, 8).map((e) => (
             <li key={e.id} className="flex items-center gap-3 py-2 text-sm sm:gap-4">
