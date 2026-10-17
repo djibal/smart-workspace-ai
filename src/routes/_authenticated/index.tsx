@@ -30,16 +30,16 @@ function Overview() {
         <Stat label="Predicted next" value={next.app} hint={`${next.confidence}% confidence · simulated`} />
       </div>
       <div className="panel mt-6 p-5">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Sample activity</h2>
           <Link to="/threats" className="text-sm text-primary">Open Threat Intelligence →</Link>
         </div>
         <ul className="divide-y">
           {events.slice(0, 8).map((e) => (
-            <li key={e.id} className="flex items-center gap-4 py-2 text-sm">
-              <span className="w-20 font-mono text-xs text-muted-foreground">{e.time}</span>
-              <span className="w-20">{e.app}</span>
-              <span className="flex-1 truncate font-mono text-muted-foreground">{e.type === "permission" ? `requests ${e.target}` : e.target}</span>
+            <li key={e.id} className="flex items-center gap-3 py-2 text-sm sm:gap-4">
+              <span className="w-16 shrink-0 font-mono text-xs text-muted-foreground sm:w-20">{e.time}</span>
+              <span className="w-16 shrink-0 truncate sm:w-20">{e.app}</span>
+              <span className="min-w-0 flex-1 truncate font-mono text-muted-foreground">{e.type === "permission" ? `requests ${e.target}` : e.target}</span>
               <RiskBadge risk={e.risk} />
             </li>
           ))}

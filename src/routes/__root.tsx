@@ -15,7 +15,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu, LogOut } from "lucide-react";
+import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu, LogOut, MonitorSmartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -82,7 +82,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#1a1d22" },
       { title: "AegisDesk Control Center" },
       { name: "description", content: "AegisDesk demo: AI threat intelligence, workspace prediction and resource allocation." },
       { property: "og:type", content: "website" },
@@ -116,10 +117,11 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const NAV = [
-  { to: "/", label: "Overview", icon: LayoutGrid },
-  { to: "/threats", label: "Threat Intelligence", icon: ShieldAlert },
-  { to: "/workspace", label: "Workspace", icon: Sparkle },
-  { to: "/resources", label: "Resources", icon: Cpu },
+  { to: "/", label: "Overview", short: "Overview", icon: LayoutGrid },
+  { to: "/threats", label: "Threat Intelligence", short: "Threats", icon: ShieldAlert },
+  { to: "/workspace", label: "Workspace", short: "Workspace", icon: Sparkle },
+  { to: "/resources", label: "Resources", short: "Resources", icon: Cpu },
+  { to: "/platforms", label: "Platforms & Roadmap", short: "Platforms", icon: MonitorSmartphone },
 ] as const;
 
 function RootComponent() {
@@ -159,47 +161,72 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+        Skip to content
+      </a>
       <div className="flex min-h-screen">
-        <aside className="hidden w-60 shrink-0 border-r bg-card/50 p-4 md:block">
-          <div className="mb-8 flex items-center gap-2 px-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold tracking-tight">AegisDesk</span>
+        {/* Tablet: icon rail. Desktop: full sidebar. */}
+        <aside aria-label="Main navigation" className="sticky top-0 hidden h-screen w-16 shrink-0 flex-col border-r bg-card/50 p-2 md:flex lg:w-60 lg:p-4">
+          <div className="mb-8 flex items-center justify-center gap-2 px-2 pt-2 lg:justify-start">
+            <Shield className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
+            <span className="hidden text-lg font-bold tracking-tight lg:inline">AegisDesk</span>
           </div>
           <nav className="space-y-1">
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
+                title={n.label}
                 activeOptions={{ exact: true }}
-                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                activeProps={{ className: "bg-accent text-accent-foreground" }}
+                className="flex min-h-11 items-center justify-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground lg:justify-start"
+                activeProps={{ className: "bg-accent text-accent-foreground", "aria-current": "page" }}
               >
-                <n.icon className="h-4 w-4" />
-                {n.label}
+                <n.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="sr-only lg:not-sr-only">{n.label}</span>
               </Link>
             ))}
           </nav>
-          <p className="mt-10 px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Demo · simulated data
-          </p>
-          <button onClick={signOut} className="mt-4 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground">
-            <LogOut className="h-4 w-4" aria-hidden="true" /> Sign out
-          </button>
+          <div className="mt-auto">
+            <p className="hidden px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground lg:block">
+              Demo · simulated data
+            </p>
+            <button onClick={signOut} title="Sign out" className="mt-4 flex min-h-11 w-full items-center justify-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground lg:justify-start">
+              <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="sr-only lg:not-sr-only">Sign out</span>
+            </button>
+          </div>
         </aside>
-        <div className="flex-1">
-          <nav className="flex gap-1 overflow-x-auto border-b p-2 md:hidden">
-            {NAV.map((n) => (
-              <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className="whitespace-nowrap rounded px-3 py-1.5 text-sm text-muted-foreground" activeProps={{ className: "bg-accent text-accent-foreground" }}>
-                {n.label}
-              </Link>
-            ))}
-            <button onClick={signOut} className="whitespace-nowrap rounded px-3 py-1.5 text-sm text-muted-foreground">Sign out</button>
-          </nav>
-          <main className="mx-auto max-w-6xl p-6 md:p-10">
+        <div className="min-w-0 flex-1">
+          {/* Mobile top bar */}
+          <header className="safe-top sticky top-0 z-30 flex items-center justify-between border-b bg-background/90 px-4 py-2 backdrop-blur md:hidden">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" aria-hidden="true" />
+              <span className="font-bold tracking-tight">AegisDesk</span>
+            </div>
+            <button onClick={signOut} className="flex min-h-11 items-center gap-2 rounded-md px-3 text-sm text-muted-foreground hover:bg-secondary">
+              <LogOut className="h-4 w-4" aria-hidden="true" /> Sign out
+            </button>
+          </header>
+          <main id="main" className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 md:p-10">
             <Outlet />
           </main>
         </div>
       </div>
+      {/* Mobile bottom navigation */}
+      <nav aria-label="Main navigation" className="safe-bottom fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden">
+        {NAV.map((n) => (
+          <Link
+            key={n.to}
+            to={n.to}
+            activeOptions={{ exact: true }}
+            className="flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[11px] text-muted-foreground"
+            activeProps={{ className: "text-primary", "aria-current": "page" }}
+          >
+            <n.icon className="h-5 w-5" aria-hidden="true" />
+            <span className="truncate">{n.short}</span>
+          </Link>
+        ))}
+      </nav>
       <Toaster theme="dark" />
     </QueryClientProvider>
   );

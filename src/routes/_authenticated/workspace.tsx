@@ -53,10 +53,10 @@ function Workspace() {
         <div className="panel p-5">
           <div className="mb-4 flex flex-wrap gap-1">
             {APPS.map((a) => (
-              <button key={a} onClick={() => setApp(a)} className={`rounded px-3 py-1 text-sm ${a === app ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-secondary"}`}>{a}</button>
+              <button key={a} onClick={() => setApp(a)} className={`min-h-10 rounded px-3 py-1 text-sm ${a === app ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-secondary"}`}>{a}</button>
             ))}
           </div>
-          <div className="grid grid-cols-[48px_repeat(6,1fr)] gap-1 text-xs">
+          <div className="grid grid-cols-[36px_repeat(6,minmax(0,1fr))] gap-1 text-[10px] sm:grid-cols-[48px_repeat(6,1fr)] sm:text-xs">
             <div />
             {BLOCKS.map((b) => <div key={b} className="text-center font-mono text-muted-foreground">{b}</div>)}
             {DAYS.map((d, di) => (
