@@ -21,4 +21,4 @@
 - [x] Deliver implementation report and stop for supervisor review; Slack remains out of scope.
 
 ## Stage L2.3
-- [ ] Diagnose performance/accessibility; minimal fixes; tests; verify 390/820/1280; report.
+- [x] Diagnose performance/accessibility; minimal fixes; tests; verify 390/820/1280; report.
