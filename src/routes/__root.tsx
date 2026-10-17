@@ -10,7 +10,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -149,6 +149,12 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router, navigate, queryClient]);
   const signOut = () => supabase.auth.signOut();
+  // Move focus to the page content after in-app navigation so keyboard and screen-reader users land on the new page.
+  const firstPath = useRef(true);
+  useEffect(() => {
+    if (firstPath.current) { firstPath.current = false; return; }
+    document.getElementById("main")?.focus({ preventScroll: true });
+  }, [path]);
 
   if (path === "/auth") {
     return (
@@ -166,12 +172,12 @@ function RootComponent() {
       </a>
       <div className="flex min-h-screen">
         {/* Tablet: icon rail. Desktop: full sidebar. */}
-        <aside aria-label="Main navigation" className="sticky top-0 hidden h-screen w-16 shrink-0 flex-col border-r bg-card/50 p-2 md:flex lg:w-60 lg:p-4">
+        <aside aria-label="Sidebar" className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col border-r bg-card/50 p-2 md:flex lg:w-60 lg:p-4">
           <div className="mb-8 flex items-center justify-center gap-2 px-2 pt-2 lg:justify-start">
             <Shield className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
             <span className="hidden text-lg font-bold tracking-tight lg:inline">AegisDesk</span>
           </div>
-          <nav className="space-y-1">
+          <nav aria-label="Main navigation" className="space-y-1">
             {NAV.map((n) => (
               <Link
                 key={n.to}
@@ -207,13 +213,13 @@ function RootComponent() {
               <LogOut className="h-4 w-4" aria-hidden="true" /> Sign out
             </button>
           </header>
-          <main id="main" className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 md:p-10">
+          <main id="main" tabIndex={-1} className="outline-none mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 md:p-10">
             <Outlet />
           </main>
         </div>
       </div>
       {/* Mobile bottom navigation */}
-      <nav aria-label="Main navigation" className="safe-bottom fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden">
+      <nav aria-label="Main navigation (mobile)" className="safe-bottom fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden">
         {NAV.map((n) => (
           <Link
             key={n.to}
