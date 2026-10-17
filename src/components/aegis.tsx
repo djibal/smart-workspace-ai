@@ -7,7 +7,7 @@ export function SimulationBanner() {
     <div
       role="note"
       aria-label="Simulation mode"
-      className="mb-6 flex items-start gap-3 rounded-md border border-warning/40 bg-warning/10 px-4 py-3 text-sm"
+      className="mb-4 flex items-start gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-xs leading-relaxed sm:mb-6 sm:gap-3 sm:px-4 sm:py-3 sm:text-sm"
     >
       <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
       <p>
@@ -37,8 +37,8 @@ export function PageHeader({ title, sub, children }: { title: string; sub: strin
   return (
     <>
       <SimulationBanner />
-      <div className="mb-6 flex flex-wrap sm:mb-8 items-end justify-between gap-4">
-        <div>
+      <div className="mb-6 grid min-w-0 gap-4 sm:mb-8 sm:flex sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
           <p className="mt-1 text-muted-foreground">{sub}</p>
         </div>
