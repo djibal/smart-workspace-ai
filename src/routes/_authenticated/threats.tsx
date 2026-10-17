@@ -1,3 +1,4 @@
+import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,13 +13,15 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/threats")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Threat Intelligence · AegisDesk" },
       { name: "description", content: "Simulated demo of AI analysis of network traffic and permission requests." },
       { property: "og:title", content: "AegisDesk Threat Intelligence" },
       { property: "og:description", content: "Demo with sample data: AI explains simulated requests and permission prompts." },
     ],
   }),
-  component: Threats,
+  ...dashboardPage(Threats, "Threat Intelligence", "Sample requests and permission prompts with simulated risk scores."),
 });
 
 type Verdict = { verdict: string; action: string; explanation: string; confidence: number };
@@ -28,6 +31,7 @@ function Threats() {
   const [sel, setSel] = useState<ThreatEvent | null>(null);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "network" | "permission">("all");
   const ask = useServerFn(askAegis);
   const ai = useAiAccess();
@@ -35,12 +39,14 @@ function Threats() {
   const explain = async () => {
     if (!sel) return;
     setLoading(true);
+    setAiError(null);
     setVerdict(null);
     try {
       const r = await ask({ data: { kind: "threat", context: sel } });
-      if ("error" in r && r.error) toast.error(r.error);
+      if ("error" in r && r.error) { setAiError(r.error); toast.error(r.error); }
       else setVerdict(r.result as Verdict);
     } catch {
+      setAiError("Couldn’t reach the AI. Check your connection and try again.");
       toast.error("Couldn't reach the AI.");
     } finally {
       setLoading(false);
@@ -59,10 +65,11 @@ function Threats() {
       </PageHeader>
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="panel max-h-[640px] overflow-y-auto">
+          {list.length === 0 && <DashboardState kind="empty" title={events.length === 0 ? "No sample events yet" : "No matching events"} message={events.length === 0 ? "Waiting for sample activity. Nothing on your device is being monitored." : "No sample events match this filter."} onRetry={events.length > 0 ? () => setFilter("all") : undefined} />}
           {list.map((e) => (
             <button
               key={e.id}
-              onClick={() => { setSel(e); setVerdict(null); }}
+              onClick={() => { setSel(e); setVerdict(null); setAiError(null); }}
               className={cn("flex min-h-11 w-full items-center gap-3 border-b sm:gap-4 px-4 py-3 text-left text-sm transition-colors hover:bg-secondary", sel?.id === e.id && "bg-accent")}
             >
               <span className="w-16 shrink-0 font-mono text-xs text-muted-foreground sm:w-20">{e.time}</span>
@@ -75,7 +82,7 @@ function Threats() {
         </div>
         <div className="panel h-fit p-5">
           {!sel ? (
-            <p className="text-sm text-muted-foreground">Select an event to inspect it.</p>
+            <DashboardState kind="empty" title="No event selected" message="Event details and AI analysis will appear here." />
           ) : (
             <>
               <div className="text-xs uppercase tracking-widest text-muted-foreground">{sel.type} · {sel.app}</div>
@@ -85,7 +92,10 @@ function Threats() {
                 {loading ? "Analysing…" : "Explain with AI"}
               </Button>
               <AiLockedNotice state={ai.state} />
-              {verdict && (
+              {loading && <DashboardState kind="loading" title="Analysing this sample event…" message="Waiting for the AI response. Nothing is being blocked or allowed." />}
+              {aiError && <DashboardState kind="error" title="Analysis unavailable" message={aiError} onRetry={ai.allowed && !loading ? explain : undefined} />}
+              {!loading && !aiError && !verdict && <DashboardState kind="empty" title="No AI analysis yet" message="This sample event has not been analysed." />}
+              {verdict && !loading && !aiError && (
                 <div className="mt-5 space-y-3 border-t pt-4">
                   <div className="flex gap-2">
                     <span className={cn("rounded px-2 py-0.5 text-xs font-semibold uppercase", verdict.verdict === "malicious" ? "bg-destructive/20 text-destructive" : verdict.verdict === "suspicious" ? "bg-warning/20 text-warning" : "bg-success/15 text-success")}>{verdict.verdict}</span>

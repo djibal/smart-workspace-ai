@@ -1,3 +1,4 @@
+import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,13 +12,15 @@ import { useAiAccess } from "@/hooks/use-ai-access";
 export const Route = createFileRoute("/_authenticated/workspace")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Workspace · AegisDesk" },
       { name: "description", content: "Simulated demo of AI app prediction and pre-loading." },
       { property: "og:title", content: "AegisDesk Automated Workspace" },
       { property: "og:description", content: "Sample usage patterns, predictions and AI workspace tips." },
     ],
   }),
-  component: Workspace,
+  ...dashboardPage(Workspace, "Automated Workspace", "Sample usage patterns showing how AegisDesk would predict your next app."),
 });
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -28,18 +31,22 @@ function Workspace() {
   const [app, setApp] = useState<(typeof APPS)[number]>("Notion");
   const [tips, setTips] = useState<{ summary: string; tips: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const ask = useServerFn(askAegis);
   const ai = useAiAccess();
-  const max = Math.max(...USAGE[app].flat());
+  const usage = USAGE[app] ?? [];
+  const max = Math.max(1, ...usage.flat());
 
   const getTips = async () => {
     setLoading(true);
+    setAiError(null);
     try {
       const totals = Object.fromEntries(APPS.map((a) => [a, USAGE[a].flat().reduce((s, x) => s + x, 0)]));
       const r = await ask({ data: { kind: "workspace", context: { weeklyMinutes: totals, predictions: preds, now: new Date().toString() } } });
-      if ("error" in r && r.error) toast.error(r.error);
+      if ("error" in r && r.error) { setAiError(r.error); toast.error(r.error); }
       else setTips(r.result as typeof tips);
     } catch {
+      setAiError("Couldn’t reach the AI. Check your connection and try again.");
       toast.error("Couldn't reach the AI.");
     } finally {
       setLoading(false);
@@ -56,13 +63,14 @@ function Workspace() {
               <button key={a} onClick={() => setApp(a)} className={`min-h-10 rounded px-3 py-1 text-sm ${a === app ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-secondary"}`}>{a}</button>
             ))}
           </div>
+          {usage.length === 0 && <DashboardState kind="empty" title="No usage history" message="No sample usage is available for this app." />}
           <div className="grid grid-cols-[36px_repeat(6,minmax(0,1fr))] gap-1 text-[10px] sm:grid-cols-[48px_repeat(6,1fr)] sm:text-xs">
             <div />
             {BLOCKS.map((b) => <div key={b} className="text-center font-mono text-muted-foreground">{b}</div>)}
             {DAYS.map((d, di) => (
               <Fragment key={d}>
                 <div className="self-center text-muted-foreground">{d}</div>
-                {USAGE[app][di]!.map((v, hi) => (
+                {(usage[di] ?? []).map((v, hi) => (
                   <div key={`${d}${hi}`} title={`${v} min`} className="h-9 rounded bg-primary" style={{ opacity: 0.08 + (v / max) * 0.92 }} />
                 ))}
               </Fragment>
@@ -72,6 +80,7 @@ function Workspace() {
         <div className="space-y-6">
           <div className="panel p-5">
             <h2 className="mb-3 font-semibold">Predicted next (simulated)</h2>
+            {preds.length === 0 && <DashboardState kind="empty" title="No predictions available" message="There is not enough sample usage to predict the next app." />}
             <ul className="space-y-3">
               {preds.slice(0, 4).map((p, i) => (
                 <li key={p.app}>
@@ -88,9 +97,13 @@ function Workspace() {
             <h2 className="mb-3 font-semibold">Workspace tips</h2>
             <Button className="w-full" onClick={getTips} disabled={loading || !ai.allowed}>{loading ? "Thinking…" : "Generate AI tips"}</Button>
             <AiLockedNotice state={ai.state} />
-            {tips && (
+            {loading && <DashboardState kind="loading" title="Generating workspace tips…" message="Waiting for the AI response. No apps are being pre-loaded." />}
+            {aiError && <DashboardState kind="error" title="Workspace tips unavailable" message={aiError} onRetry={ai.allowed && !loading ? getTips : undefined} />}
+            {!loading && !aiError && !tips && <DashboardState kind="empty" title="No workspace tips yet" message="No AI tips have been requested for this sample workspace." />}
+            {tips && !loading && !aiError && (
               <div className="mt-4 space-y-2 text-sm">
                 <p className="text-muted-foreground">{tips.summary}</p>
+                {tips.tips.length === 0 && <DashboardState kind="empty" title="No tips returned" message="The AI returned no additional workspace tips." />}
                 <ul className="list-disc space-y-1 pl-5">{tips.tips.map((t) => <li key={t}>{t}</li>)}</ul>
               </div>
             )}

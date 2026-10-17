@@ -1,3 +1,4 @@
+import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, Stat, RiskBadge } from "@/components/aegis";
 import { useThreatFeed, useResources, predictions } from "@/lib/sim";
@@ -5,13 +6,15 @@ import { useThreatFeed, useResources, predictions } from "@/lib/sim";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Overview · AegisDesk Control Center" },
       { name: "description", content: "Simulated overview of AegisDesk threats, predicted apps and resource use." },
       { property: "og:title", content: "AegisDesk Control Center" },
       { property: "og:description", content: "Demo with sample data of AegisDesk security and performance features." },
     ],
   }),
-  component: Overview,
+  ...dashboardPage(Overview, "Control Center", "A preview of how AegisDesk would protect and tune your apps."),
 });
 
 function Overview() {
@@ -19,21 +22,23 @@ function Overview() {
   const { apps } = useResources();
   const blocked = events.filter((e) => e.risk >= 70).length;
   const ram = apps.reduce((s, a) => s + a.ram, 0);
-  const next = predictions()[0]!;
+  const next = predictions()[0];
   return (
     <>
       <PageHeader title="Control Center" sub="A preview of how AegisDesk would protect and tune your apps." />
+      {apps.length === 0 && <DashboardState kind="empty" title="No resource data available" message="Sample app figures haven’t been provided." />}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Apps running" value={apps.filter((a) => a.state !== "suspended").length} />
         <Stat label="High-risk events" value={blocked} hint="simulated · none actually blocked" />
         <Stat label="Total RAM" value={`${ram} MB`} hint="simulated figures" />
-        <Stat label="Predicted next" value={next.app} hint={`${next.confidence}% confidence · simulated`} />
+        <Stat label="Predicted next" value={next?.app ?? "Unavailable"} hint={next ? `${next.confidence}% confidence · simulated` : "No predictions available"} />
       </div>
       <div className="panel mt-6 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Sample activity</h2>
           <Link to="/threats" className="text-sm text-primary">Open Threat Intelligence →</Link>
         </div>
+        {events.length === 0 && <DashboardState kind="empty" title="No sample activity yet" message="Waiting for sample events. No device monitoring is taking place." />}
         <ul className="divide-y">
           {events.slice(0, 8).map((e) => (
             <li key={e.id} className="flex items-center gap-3 py-2 text-sm sm:gap-4">

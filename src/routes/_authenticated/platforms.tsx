@@ -1,3 +1,4 @@
+import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { Apple, Gamepad2, Monitor, Smartphone, TabletSmartphone } from "lucide-react";
 import { PageHeader } from "@/components/aegis";
@@ -6,13 +7,15 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/platforms")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Platforms & Roadmap · AegisDesk" },
       { name: "description", content: "AegisDesk development targets and feature status for macOS, Windows, Android and iOS." },
       { property: "og:title", content: "AegisDesk Platforms & Roadmap" },
       { property: "og:description", content: "Which AegisDesk features are implemented, experimental, planned or unavailable on each platform." },
     ],
   }),
-  component: Platforms,
+  ...dashboardPage(Platforms, "Platforms & Roadmap", "Where AegisDesk is heading, and what actually exists today."),
 });
 
 type Status = "implemented" | "experimental" | "planned" | "unavailable";
@@ -64,6 +67,7 @@ function Platforms() {
 
       <section aria-labelledby="targets" className="mb-8">
         <h2 id="targets" className="mb-3 font-semibold">Development targets</h2>
+        {PLATFORMS.length === 0 && <DashboardState kind="empty" title="No development targets available" message="No platform information has been provided." />}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PLATFORMS.map((p) => (
             <div key={p.name} className="panel flex flex-col gap-3 p-5">
@@ -80,6 +84,7 @@ function Platforms() {
 
       <section aria-labelledby="features" className="mb-8">
         <h2 id="features" className="mb-3 font-semibold">Feature status</h2>
+        {FEATURES.length === 0 && <DashboardState kind="empty" title="No feature status available" message="No roadmap entries have been provided." />}
         <div className="panel overflow-x-auto">
           <table className="w-full min-w-[560px] text-sm">
             <caption className="sr-only">Feature status by platform</caption>
