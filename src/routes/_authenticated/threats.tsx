@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader, AiLockedNotice } from "@/components/aegis";
 import { ThreatSeverity } from "@/components/threat-severity";
 import { useThreatFeed, type ThreatEvent } from "@/lib/sim";
-import { recommendationDisplay, threatDisplay } from "@/lib/threat-display";
+import { recommendationDisplay, threatDisplay, type ThreatAction } from "@/lib/threat-display";
 import { aiResultSchemas } from "@/lib/ai.schemas";
 import { askAegis } from "@/lib/ai.functions";
 import { useAiAccess } from "@/hooks/use-ai-access";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/threats")({
   ...dashboardPage(Threats, "Threat Intelligence", "Sample requests and permission prompts with simulated risk scores."),
 });
 
-type Verdict = { verdict: string; action: string; explanation: string; confidence: number };
+type Verdict = { verdict: "safe" | "suspicious" | "malicious"; action: ThreatAction; explanation: string; confidence: number };
 
 function Threats() {
   const events = useThreatFeed();
@@ -62,7 +62,7 @@ function Threats() {
 
   const list = (pausedEvents ?? events).filter((e) => filter === "all" || e.type === filter);
   const selectedDisplay = sel ? threatDisplay(sel) : null;
-  const recommendation = selectedDisplay ? recommendationDisplay(verdict?.action as "allow" | "ask" | "block" ?? selectedDisplay.action) : null;
+  const recommendation = selectedDisplay ? recommendationDisplay(verdict?.action ?? selectedDisplay.action) : null;
   return (
     <>
       <PageHeader title="Threat Intelligence" sub="Sample requests and permission prompts with simulated risk scores.">
