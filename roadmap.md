@@ -1,0 +1,3 @@
+- [ ] Add shared loading and recoverable error states to five dashboard pages.
+- [ ] Add contextual empty states and inline AI feedback.
+- [ ] Verify authenticated pages and run existing tests.
