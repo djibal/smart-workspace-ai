@@ -63,11 +63,11 @@ function Threats() {
             <button
               key={e.id}
               onClick={() => { setSel(e); setVerdict(null); }}
-              className={cn("flex w-full items-center gap-4 border-b px-4 py-3 text-left text-sm transition-colors hover:bg-secondary", sel?.id === e.id && "bg-accent")}
+              className={cn("flex min-h-11 w-full items-center gap-3 border-b sm:gap-4 px-4 py-3 text-left text-sm transition-colors hover:bg-secondary", sel?.id === e.id && "bg-accent")}
             >
-              <span className="w-20 font-mono text-xs text-muted-foreground">{e.time}</span>
-              <span className="w-16">{e.app}</span>
-              <span className="w-24 text-xs uppercase tracking-wider text-muted-foreground">{e.type}</span>
+              <span className="w-16 shrink-0 font-mono text-xs text-muted-foreground sm:w-20">{e.time}</span>
+              <span className="w-16 shrink-0 truncate">{e.app}</span>
+              <span className="hidden w-24 text-xs uppercase tracking-wider text-muted-foreground sm:inline">{e.type}</span>
               <span className="flex-1 truncate font-mono">{e.target}</span>
               <RiskBadge risk={e.risk} />
             </button>
