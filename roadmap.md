@@ -10,3 +10,6 @@
 ## Stage L2.1
 - [x] Workspace app cards with client-side search, status filter and reset; no-results state.
 - [x] Focused filter tests; verified 390/820/1280 px signed in.
+
+## Slack lead alerts
+- [ ] Post new lead details to Slack (blocked: app has no lead form yet; awaiting user answer)
