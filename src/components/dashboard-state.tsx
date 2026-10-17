@@ -8,7 +8,7 @@ export function DashboardState({ kind, title, message, onRetry }: {
   kind: "loading" | "empty" | "error";
   title: string;
   message: string;
-  onRetry?: () => void;
+  onRetry?: (() => void) | undefined;
 }) {
   const Icon = kind === "loading" ? LoaderCircle : kind === "error" ? AlertCircle : Inbox;
   return (
@@ -26,9 +26,9 @@ function PageLoading({ title, sub }: { title: string; sub: string }) {
 }
 
 class DashboardBoundary extends Component<{ title: string; sub: string; children: ReactNode }, { failed: boolean; attempt: number }> {
-  state = { failed: false, attempt: 0 };
+  override state = { failed: false, attempt: 0 };
   static getDerivedStateFromError() { return { failed: true }; }
-  render() {
+  override render() {
     if (this.state.failed) return <><PageHeader title={this.props.title} sub={this.props.sub} /><DashboardState kind="error" title="This page couldn’t load" message="The page data is unavailable. Try again to reload this page." onRetry={() => this.setState(({ attempt }) => ({ failed: false, attempt: attempt + 1 }))} /></>;
     return <div key={this.state.attempt}>{this.props.children}</div>;
   }
