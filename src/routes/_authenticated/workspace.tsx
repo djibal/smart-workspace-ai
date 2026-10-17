@@ -64,7 +64,7 @@ function Workspace() {
             ))}
           </div>
           {usage.length === 0 && <DashboardState kind="empty" title="No usage history" message="No sample usage is available for this app." />}
-          <div className="grid grid-cols-[36px_repeat(6,minmax(0,1fr))] gap-1 text-[10px] sm:grid-cols-[48px_repeat(6,1fr)] sm:text-xs">
+          {usage.length > 0 && <div className="grid grid-cols-[36px_repeat(6,minmax(0,1fr))] gap-1 text-[10px] sm:grid-cols-[48px_repeat(6,1fr)] sm:text-xs">
             <div />
             {BLOCKS.map((b) => <div key={b} className="text-center font-mono text-muted-foreground">{b}</div>)}
             {DAYS.map((d, di) => (
@@ -75,7 +75,7 @@ function Workspace() {
                 ))}
               </Fragment>
             ))}
-          </div>
+          </div>}
         </div>
         <div className="space-y-6">
           <div className="panel p-5">
