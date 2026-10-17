@@ -65,12 +65,13 @@ function Threats() {
       </PageHeader>
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="panel max-h-[640px] overflow-y-auto">
-          {list.length === 0 && <DashboardState kind="empty" title={events.length === 0 ? "No sample events yet" : "No matching events"} message={events.length === 0 ? "Waiting for sample activity. Nothing on your device is being monitored." : "No sample events match this filter."} onRetry={events.length > 0 ? () => setFilter("all") : undefined} />}
+          {list.length === 0 && <DashboardState kind="empty" title={events.length === 0 ? "No sample events yet" : "No matching events"} message={events.length === 0 ? "No sample activity is available. This does not indicate that your device is safe or being monitored." : "No sample events match this filter."} onRetry={events.length > 0 ? () => setFilter("all") : undefined} retryLabel="Show all events" />}
           {list.map((e) => (
             <button
               key={e.id}
+              disabled={loading}
               onClick={() => { setSel(e); setVerdict(null); setAiError(null); }}
-              className={cn("flex min-h-11 w-full items-center gap-3 border-b sm:gap-4 px-4 py-3 text-left text-sm transition-colors hover:bg-secondary", sel?.id === e.id && "bg-accent")}
+              className={cn("flex min-h-11 w-full items-center gap-3 border-b sm:gap-4 px-4 py-3 text-left text-sm transition-colors hover:bg-secondary disabled:cursor-wait", sel?.id === e.id && "bg-accent")}
             >
               <span className="w-16 shrink-0 font-mono text-xs text-muted-foreground sm:w-20">{e.time}</span>
               <span className="w-16 shrink-0 truncate">{e.app}</span>
