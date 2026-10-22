@@ -86,7 +86,7 @@ function LeadPage() {
             <Button variant="outline" className="mt-6 min-h-11" onClick={() => setSaved(false)}>Send another message</Button>
           </div>
         ) : (
-          <form onSubmit={onSubmit} noValidate className="mt-10 space-y-6" aria-busy={busy}>
+          <form method="post" onSubmit={onSubmit} noValidate className="mt-10 space-y-6" aria-busy={busy}>
             <div className="grid gap-6 sm:grid-cols-2">
               {field("name", "Name", true, 100, "name")}
               {field("email", "Email", true, 254, "email", "email")}
