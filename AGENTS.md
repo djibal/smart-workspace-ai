@@ -11,8 +11,9 @@
 
 - AI server functions require `requireSupabaseAuth` and validate input/output with zod schemas in `src/lib/ai.schemas.ts` — the AI gateway costs credits and must never be callable anonymously.
 - Every dashboard page shows the Simulation Mode banner (via `PageHeader`) while data is generated — users must not mistake sample data for real protection.
-- Dashboard pages live under `src/routes/_authenticated/` (client-only gate); `/auth` is the only public page — access is private by default, signup is disabled.
+- Dashboard pages live under `src/routes/_authenticated/` (client-only gate); `/auth` and `/leads` are public — dashboard access remains private and signup is disabled.
 - AI quota is reserved atomically in the database (`reserve_ai_request`) before any gateway call and finalized/refunded only server-side (`finish_ai_request`, service role) — client counters are never trusted and users have read-only access to their own usage rows.
 - Dashboard pages use shared status UI and page boundaries for hydration, route delays and recoverable render failures; sample data stays local and AI request feedback stays inline without changing security or quota logic.
 - Threat presentation uses the client-only threat-display module and existing simulation severity thresholds; recommendation availability is explicitly informational to prevent presentation from implying enforcement.
 - On-demand briefings extend the existing raw-HTTP AI integration and use the workspace quota category; this preserves shared atomic accounting without introducing a new database kind or automatic paid requests.
+- Public lead submission uses a dedicated validated server function and a service-role-only table; anonymous visitors cannot read submissions or access dashboard data.
