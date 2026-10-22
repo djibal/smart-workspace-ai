@@ -14,6 +14,11 @@
 ## Slack lead alerts
 - [ ] Post new lead details to Slack (blocked: Slack connection declined; not part of the public lead page request).
 
+## Web GameHub
+- [ ] Add private game library, search/category filters, and explicit external launch confirmation.
+- [ ] Link official mobile game pages and keep native protection capabilities labelled planned.
+- [ ] Verify launch/filter flow, authenticated access and layouts; run tests.
+
 ## Stage L2.2
 - [x] Refine simulated threat severity, permission guidance, and recoverable feedback.
 - [x] Compact shared Simulation Mode warning and verify keyboard/mobile usability.
