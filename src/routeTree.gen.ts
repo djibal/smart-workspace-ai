@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedPlatformsRouteImport } from './routes/_authenticated/platforms'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
@@ -24,6 +25,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsRoute = LeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -55,6 +61,7 @@ const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/leads': typeof LeadsRoute
   '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/leads': typeof LeadsRoute
   '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/leads': typeof LeadsRoute
   '/_authenticated/platforms': typeof AuthenticatedPlatformsRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/threats': typeof AuthenticatedThreatsRoute
@@ -81,13 +90,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/platforms' | '/resources' | '/threats' | '/workspace'
+    | '/'
+    | '/auth'
+    | '/leads'
+    | '/platforms'
+    | '/resources'
+    | '/threats'
+    | '/workspace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/platforms' | '/resources' | '/threats' | '/workspace' | '/'
+  to:
+    | '/auth'
+    | '/leads'
+    | '/platforms'
+    | '/resources'
+    | '/threats'
+    | '/workspace'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/leads'
     | '/_authenticated/platforms'
     | '/_authenticated/resources'
     | '/_authenticated/threats'
@@ -98,6 +121,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LeadsRoute: typeof LeadsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -114,6 +138,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads': {
+      id: '/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof LeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -176,6 +207,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LeadsRoute: LeadsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
