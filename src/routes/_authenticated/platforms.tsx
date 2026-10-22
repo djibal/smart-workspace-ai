@@ -1,5 +1,6 @@
 import { DashboardState, dashboardPage } from "@/components/dashboard-state";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { Apple, Gamepad2, Monitor, Smartphone, TabletSmartphone } from "lucide-react";
 import { PageHeader } from "@/components/aegis";
 import { cn } from "@/lib/utils";
@@ -122,25 +123,26 @@ function Platforms() {
         </p>
       </section>
 
-      <section aria-labelledby="gamehub" className="panel p-5">
+      <section aria-labelledby="gamehub" className="border-t pt-5">
         <div className="flex flex-wrap items-center gap-3">
           <Gamepad2 className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
           <h2 id="gamehub" className="font-semibold">GameHub</h2>
           <Pill status="planned" />
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          A future space for games, with the same protection as your other apps. Nothing here works yet.
+           The web library is available with browser-game launch links and official mobile destinations. Native game protection remains planned.
         </p>
         <ul className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <li className="rounded-md border p-4">
             <div className="font-medium">Browser games</div>
-            <p className="mt-1 text-muted-foreground">Run web games in their own isolated, HTTPS-only window with resource limits.</p>
+             <p className="mt-1 text-muted-foreground">Open curated HTTPS game sites in a normal browser tab. Isolated native windows and resource limits are not available here.</p>
           </li>
           <li className="rounded-md border p-4">
             <div className="font-medium">Mobile gaming integration</div>
-            <p className="mt-1 text-muted-foreground">Explore links with official mobile apps. Running Android apps or emulators is not planned.</p>
+             <p className="mt-1 text-muted-foreground">Visit official mobile game destinations. Running Android apps or emulators is not planned.</p>
           </li>
         </ul>
+        <Button asChild className="mt-4 min-h-11"><Link to="/gamehub"><Gamepad2 aria-hidden="true" />Open GameHub</Link></Button>
       </section>
     </>
   );
