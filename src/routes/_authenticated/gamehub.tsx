@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight, ExternalLink, Gamepad2, LockKeyhole, Search, Smartphone, X } from "lucide-react";
 import { PageHeader } from "@/components/aegis";
@@ -27,6 +27,7 @@ function GameHub() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [destination, setDestination] = useState<Destination | null>(null);
+  const launchButton = useRef<HTMLButtonElement | null>(null);
   const filtered = filterGames(GAMES, query, category);
   const reset = () => { setQuery(""); setCategory("all"); };
   return <>
@@ -44,13 +45,13 @@ function GameHub() {
       {filtered.length === 0 ? <DashboardState kind="empty" title="No matching games" message="No games match your search and category." onRetry={reset} retryLabel="Clear filters" /> : <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {filtered.map((game) => <article key={game.id} className="panel flex min-w-0 flex-col overflow-hidden">
           <GameArt id={game.id} />
-          <div className="flex flex-1 flex-col p-4"><div className="mb-2 flex items-start justify-between gap-2"><h3 className="text-lg font-semibold">{game.name}</h3><span className="rounded bg-accent px-2 py-1 text-xs text-accent-foreground">{game.category}</span></div><p className="mb-3 text-xs text-muted-foreground">{game.publisher}</p><p className="mb-5 flex-1 text-sm text-muted-foreground">{game.description}</p><Button variant="secondary" className="min-h-11 w-full" aria-label={`Open ${game.name}`} onClick={() => setDestination(game)}>Open game<ArrowUpRight aria-hidden="true" /></Button></div>
+          <div className="flex flex-1 flex-col p-4"><div className="mb-2 flex items-start justify-between gap-2"><h3 className="text-lg font-semibold">{game.name}</h3><span className="rounded bg-accent px-2 py-1 text-xs text-accent-foreground">{game.category}</span></div><p className="mb-3 text-xs text-muted-foreground">{game.publisher}</p><p className="mb-5 flex-1 text-sm text-muted-foreground">{game.description}</p><Button variant="secondary" className="min-h-11 w-full" aria-label={`Open ${game.name}`} onClick={(event) => { launchButton.current = event.currentTarget; setDestination(game); }}>Open game<ArrowUpRight aria-hidden="true" /></Button></div>
         </article>)}
       </div>}
     </section>
     <section aria-labelledby="mobile-destinations" className="mt-8 border-t pt-6">
       <div className="mb-4 flex items-center gap-2"><Smartphone aria-hidden="true" className="h-5 w-5 text-primary" /><h2 id="mobile-destinations" className="text-lg font-semibold">Official mobile destinations</h2></div>
-      <div className="grid gap-4 sm:grid-cols-2">{MOBILE_DESTINATIONS.map((entry) => <article key={entry.id} className="panel flex min-w-0 flex-col gap-3 p-5"><h3 className="font-semibold">{entry.name}</h3><p className="flex-1 text-sm text-muted-foreground">{entry.description}</p><Button variant="outline" className="min-h-11 self-start" onClick={() => setDestination(entry)}>Visit official site<ExternalLink aria-hidden="true" /></Button></article>)}</div>
+      <div className="grid gap-4 sm:grid-cols-2">{MOBILE_DESTINATIONS.map((entry) => <article key={entry.id} className="panel flex min-w-0 flex-col gap-3 p-5"><h3 className="font-semibold">{entry.name}</h3><p className="flex-1 text-sm text-muted-foreground">{entry.description}</p><Button variant="outline" className="min-h-11 self-start" onClick={(event) => { launchButton.current = event.currentTarget; setDestination(entry); }}>Visit official site<ExternalLink aria-hidden="true" /></Button></article>)}</div>
       <p className="mt-3 text-xs text-muted-foreground">Links only. AegisDesk does not run Android or iOS apps, install games, or provide an emulator.</p>
     </section>
     <section aria-labelledby="native-roadmap" className="mt-8 border-t pt-6">
@@ -59,7 +60,7 @@ function GameHub() {
       <p className="mt-3 text-xs text-muted-foreground">Unavailable in this web app. An HTTPS link is not a guarantee that a game is safe.</p>
     </section>
     <Dialog open={destination !== null} onOpenChange={(open) => { if (!open) setDestination(null); }}>
-      <DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg">
+      <DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg" onCloseAutoFocus={(event) => { event.preventDefault(); launchButton.current?.focus(); }}>
         <DialogHeader><DialogTitle className="pr-8">Open {destination?.name}?</DialogTitle><DialogDescription>You are leaving AegisDesk for a third-party website in a new tab.</DialogDescription></DialogHeader>
         {destination && <><p className="break-all rounded-md border bg-secondary p-3 font-mono text-xs">{destination.url}</p><p className="text-sm text-muted-foreground">{destination.note}</p><p className="text-sm text-warning">No AegisDesk isolation or resource limits apply. The website’s privacy policy, permissions, and terms apply.</p><div className="flex flex-wrap justify-end gap-2"><DialogClose asChild><Button variant="outline" className="min-h-11">Cancel</Button></DialogClose>{approvedDestination(destination.url) && <Button asChild className="min-h-11"><a href={destination.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" onClick={() => setDestination(null)}>Continue to site<ExternalLink aria-hidden="true" /></a></Button>}</div></>}
       </DialogContent>
