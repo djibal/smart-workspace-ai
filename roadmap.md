@@ -22,3 +22,7 @@
 
 ## Stage L2.3
 - [x] Diagnose performance/accessibility; minimal fixes; tests; verify 390/820/1280; report.
+
+## OpenAI daily briefing
+- [ ] Add an on-demand sample-data briefing to Overview using existing authenticated AI and daily quota.
+- [ ] Validate briefing inputs/results, test, and verify the signed-in flow.
