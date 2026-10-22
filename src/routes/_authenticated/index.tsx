@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { DailyBriefing } from "@/components/daily-briefing";
 import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, Stat, RiskBadge } from "@/components/aegis";
@@ -34,6 +35,7 @@ function Overview() {
         <Stat label="Total RAM" value={apps.length ? `${ram} MB` : "Unavailable"} hint="simulated figures" />
         <Stat label="Predicted next" value={next?.app ?? "Unavailable"} hint={next ? `${next.confidence}% confidence · simulated` : "No predictions available"} />
       </div>
+      <DailyBriefing events={events} apps={apps} />
       <div className="panel mt-6 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Sample activity</h2>

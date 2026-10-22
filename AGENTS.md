@@ -15,3 +15,4 @@
 - AI quota is reserved atomically in the database (`reserve_ai_request`) before any gateway call and finalized/refunded only server-side (`finish_ai_request`, service role) — client counters are never trusted and users have read-only access to their own usage rows.
 - Dashboard pages use shared status UI and page boundaries for hydration, route delays and recoverable render failures; sample data stays local and AI request feedback stays inline without changing security or quota logic.
 - Threat presentation uses the client-only threat-display module and existing simulation severity thresholds; recommendation availability is explicitly informational to prevent presentation from implying enforcement.
+- On-demand briefings extend the existing raw-HTTP AI integration and use the workspace quota category; this preserves shared atomic accounting without introducing a new database kind or automatic paid requests.
