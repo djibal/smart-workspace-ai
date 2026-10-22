@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { FlaskConical, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function SimulationBanner() {
+export function SimulationBanner({ message }: { message?: string | undefined }) {
   return (
     <div
       role="note"
@@ -13,8 +13,7 @@ export function SimulationBanner() {
       <p>
         <strong className="font-semibold text-warning">Simulation Mode.</strong>{" "}
         <span className="text-muted-foreground">
-          All apps, events, usage and resource figures on this page are generated sample data. Nothing is being
-          monitored, blocked or limited on your device.
+          {message ?? "All apps, events, usage and resource figures on this page are generated sample data. Nothing is being monitored, blocked or limited on your device."}
         </span>
       </p>
     </div>
@@ -33,10 +32,10 @@ export function AiLockedNotice({ state }: { state: "checking" | "signed-in" | "s
   );
 }
 
-export function PageHeader({ title, sub, children }: { title: string; sub: string; children?: ReactNode }) {
+export function PageHeader({ title, sub, children, simulationMessage }: { title: string; sub: string; children?: ReactNode; simulationMessage?: string | undefined }) {
   return (
     <>
-      <SimulationBanner />
+      <SimulationBanner message={simulationMessage} />
       <div className="mb-6 grid min-w-0 gap-4 sm:mb-8 sm:flex sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>

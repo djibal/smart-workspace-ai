@@ -1,0 +1,9 @@
+// Schematic previews, not publisher screenshots. Colours use dashboard tokens.
+export function GameArt({ id }: { id: string }) {
+  return <div aria-hidden="true" className="flex aspect-[16/9] items-center justify-center overflow-hidden border-b bg-secondary/50">
+    {id === "2048" && <div className="grid w-36 grid-cols-4 gap-1 rounded-md bg-background p-2 font-mono text-sm font-semibold">{[2, 4, 0, 0, 4, 8, 0, 0, 8, 16, 32, 0, 16, 32, 64, 128].map((n, i) => <span key={i} className={`flex aspect-square items-center justify-center rounded-sm ${n >= 32 ? "bg-warning/20 text-warning" : n ? "bg-accent text-accent-foreground" : "bg-muted"}`}>{n || ""}</span>)}</div>}
+    {id === "lichess" && <div className="grid w-36 grid-cols-4 overflow-hidden rounded-sm text-3xl">{Array.from({ length: 16 }, (_, i) => <span key={i} className={`flex aspect-square items-center justify-center ${((i % 4) + Math.floor(i / 4)) % 2 ? "bg-muted text-foreground" : "bg-accent text-accent-foreground"}`}>{i === 5 ? "♞" : i === 10 ? "♔" : i === 15 ? "♟" : ""}</span>)}</div>}
+    {id === "tetrio" && <div className="grid w-28 grid-cols-6 gap-1 rounded-sm bg-background p-2">{Array.from({ length: 42 }, (_, i) => <span key={i} className={`aspect-square rounded-sm ${[9, 10, 15, 16, 26, 32, 38, 39].includes(i) ? "bg-primary" : i > 29 && ![31, 33].includes(i) ? "bg-warning" : "bg-muted"}`} />)}</div>}
+    {id === "hextris" && <svg viewBox="0 0 200 160" className="h-36 w-44" fill="none"><path d="M100 20 152 50 152 110 100 140 48 110 48 50Z" className="stroke-primary" strokeWidth="12" strokeDasharray="48 14" /><path d="M100 40 134 60 134 100 100 120 66 100 66 60Z" className="stroke-warning" strokeWidth="10" strokeDasharray="25 15" /><path d="M100 60 117 70 117 90 100 100 83 90 83 70Z" className="fill-accent stroke-primary" strokeWidth="2" /></svg>}
+  </div>;
+}

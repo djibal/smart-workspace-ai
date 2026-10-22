@@ -41,33 +41,33 @@ export function DashboardState({ kind, title, message, onRetry, retryLabel = "Tr
   );
 }
 
-function PageLoading({ title, sub }: { title: string; sub: string }) {
-  return <><PageHeader title={title} sub={sub} /><DashboardState kind="loading" title={`Loading ${title.toLowerCase()}…`} message="Preparing this page. Sample figures are not live device data." /></>;
+function PageLoading({ title, sub, simulationMessage }: { title: string; sub: string; simulationMessage?: string | undefined }) {
+  return <><PageHeader title={title} sub={sub} simulationMessage={simulationMessage} /><DashboardState kind="loading" title={`Loading ${title.toLowerCase()}…`} message="Preparing this page. No live device monitoring is taking place." /></>;
 }
 
-class DashboardBoundary extends Component<{ title: string; sub: string; children: ReactNode }, { failed: boolean; attempt: number }> {
+class DashboardBoundary extends Component<{ title: string; sub: string; children: ReactNode; simulationMessage?: string | undefined }, { failed: boolean; attempt: number }> {
   override state = { failed: false, attempt: 0 };
   static getDerivedStateFromError() { return { failed: true }; }
   override render() {
-    if (this.state.failed) return <><PageHeader title={this.props.title} sub={this.props.sub} /><DashboardState kind="error" title={`${this.props.title} couldn’t load`} message="This page couldn’t be displayed. Try again; the other pages are still available." onRetry={() => this.setState(({ attempt }) => ({ failed: false, attempt: attempt + 1 }))} /></>;
+    if (this.state.failed) return <><PageHeader title={this.props.title} sub={this.props.sub} simulationMessage={this.props.simulationMessage} /><DashboardState kind="error" title={`${this.props.title} couldn’t load`} message="This page couldn’t be displayed. Try again; the other pages are still available." onRetry={() => this.setState(({ attempt }) => ({ failed: false, attempt: attempt + 1 }))} /></>;
     return <div key={this.state.attempt}>{this.props.children}</div>;
   }
 }
 
 // A real hydration/loading state; no artificial delays or network calls for static sample data.
-export function dashboardPage(Page: () => ReactNode, title: string, sub: string) {
+export function dashboardPage(Page: () => ReactNode, title: string, sub: string, simulationMessage?: string) {
   function ReadyPage() {
     const [ready, setReady] = useState(false);
     useEffect(() => { setReady(true); }, []);
-    return ready ? <Page /> : <PageLoading title={title} sub={sub} />;
+    return ready ? <Page /> : <PageLoading title={title} sub={sub} simulationMessage={simulationMessage} />;
   }
   function DashboardPage() {
-    return <DashboardBoundary title={title} sub={sub}><ReadyPage /></DashboardBoundary>;
+    return <DashboardBoundary title={title} sub={sub} simulationMessage={simulationMessage}><ReadyPage /></DashboardBoundary>;
   }
-  function PendingPage() { return <PageLoading title={title} sub={sub} />; }
+  function PendingPage() { return <PageLoading title={title} sub={sub} simulationMessage={simulationMessage} />; }
   function ErrorPage({ reset }: ErrorComponentProps) {
     const router = useRouter();
-    return <><PageHeader title={title} sub={sub} /><DashboardState kind="error" title={`${title} couldn’t load`} message="This page is unavailable. Try again; the other pages are still available." onRetry={async () => { await router.invalidate({ sync: true }); reset(); }} /></>;
+    return <><PageHeader title={title} sub={sub} simulationMessage={simulationMessage} /><DashboardState kind="error" title={`${title} couldn’t load`} message="This page is unavailable. Try again; the other pages are still available." onRetry={async () => { await router.invalidate({ sync: true }); reset(); }} /></>;
   }
   return { component: DashboardPage, pendingComponent: PendingPage, errorComponent: ErrorPage };
 }
