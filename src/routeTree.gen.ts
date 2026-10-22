@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedGamehubRouteImport } from './routes/_authenticated/gamehub'
 import { Route as AuthenticatedPlatformsRouteImport } from './routes/_authenticated/platforms'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedThreatsRouteImport } from './routes/_authenticated/threats'
@@ -35,6 +36,11 @@ const LeadsRoute = LeadsRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGamehubRoute = AuthenticatedGamehubRouteImport.update({
+  id: '/gamehub',
+  path: '/gamehub',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPlatformsRoute = AuthenticatedPlatformsRouteImport.update({
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/leads': typeof LeadsRoute
+  '/gamehub': typeof AuthenticatedGamehubRoute
   '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/leads': typeof LeadsRoute
+  '/gamehub': typeof AuthenticatedGamehubRoute
   '/platforms': typeof AuthenticatedPlatformsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/threats': typeof AuthenticatedThreatsRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/leads': typeof LeadsRoute
+  '/_authenticated/gamehub': typeof AuthenticatedGamehubRoute
   '/_authenticated/platforms': typeof AuthenticatedPlatformsRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/threats': typeof AuthenticatedThreatsRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/leads'
+    | '/gamehub'
     | '/platforms'
     | '/resources'
     | '/threats'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/leads'
+    | '/gamehub'
     | '/platforms'
     | '/resources'
     | '/threats'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/leads'
+    | '/_authenticated/gamehub'
     | '/_authenticated/platforms'
     | '/_authenticated/resources'
     | '/_authenticated/threats'
@@ -154,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gamehub': {
+      id: '/_authenticated/gamehub'
+      path: '/gamehub'
+      fullPath: '/gamehub'
+      preLoaderRoute: typeof AuthenticatedGamehubRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/platforms': {
       id: '/_authenticated/platforms'
       path: '/platforms'
@@ -186,6 +205,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedGamehubRoute: typeof AuthenticatedGamehubRoute
   AuthenticatedPlatformsRoute: typeof AuthenticatedPlatformsRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedThreatsRoute: typeof AuthenticatedThreatsRoute
@@ -194,6 +214,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedGamehubRoute: AuthenticatedGamehubRoute,
   AuthenticatedPlatformsRoute: AuthenticatedPlatformsRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedThreatsRoute: AuthenticatedThreatsRoute,
