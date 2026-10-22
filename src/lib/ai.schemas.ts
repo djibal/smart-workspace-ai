@@ -49,6 +49,14 @@ const resourcesContext = z
 
 export const aiRequestSchema = z
   .discriminatedUnion("kind", [
+    z.object({ kind: z.literal("briefing"), context: z.object({
+      simulated: z.literal(true),
+      capturedAt: z.string().datetime(),
+      events: z.array(threatContext).max(40),
+      apps: z.array(z.object({ app: appName, cpu: z.number().min(0).max(100), ram: z.number().min(0).max(8192), state: z.enum(["active", "idle", "suspended"]) }).strict()).max(20),
+      weeklyMinutes: z.record(appName, z.number().min(0).max(100000)),
+      predictions: z.array(z.object({ app: appName, confidence: z.number().min(0).max(100) }).strict()).max(20),
+    }).strict() }).strict(),
     z.object({ kind: z.literal("threat"), context: threatContext }).strict(),
     z.object({ kind: z.literal("workspace"), context: workspaceContext }).strict(),
     z.object({ kind: z.literal("resources"), context: resourcesContext }).strict(),
@@ -61,6 +69,15 @@ export type AiRequest = z.infer<typeof aiRequestSchema>;
 export type AiKind = AiRequest["kind"];
 
 export const aiResultSchemas = {
+  briefing: z.object({
+    summary: z.string().min(1).max(2000),
+    priorities: z.array(z.object({
+      category: z.enum(["security", "workspace", "resources"]),
+      title: z.string().min(1).max(120),
+      observation: z.string().min(1).max(600),
+      suggestion: z.string().min(1).max(600),
+    }).strict()).min(1).max(3),
+  }).strict(),
   threat: z.object({
     verdict: z.enum(["safe", "suspicious", "malicious"]),
     action: z.enum(["allow", "ask", "block"]),
