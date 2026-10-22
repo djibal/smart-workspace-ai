@@ -28,5 +28,5 @@
 - [x] Validate briefing inputs/results; 45 tests passed, automatic build OK, real signed-in OpenAI response verified at 390/820/1280px.
 
 ## Public lead page
-- [ ] Add public /leads with validated name, email, company, phone and message; store private submissions.
-- [ ] Test unsigned submission, verify saved row and mobile layout, remove test entry.
+- [x] Add public /leads with validated name, email, company, phone and message; store private submissions in Cloud.
+- [x] Test unsigned submission and saved fields; verify 390/820/1280px, private dashboard gate, 50 passing tests and automatic build OK; remove only the test entry.
