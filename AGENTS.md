@@ -17,3 +17,4 @@
 - Threat presentation uses the client-only threat-display module and existing simulation severity thresholds; recommendation availability is explicitly informational to prevent presentation from implying enforcement.
 - On-demand briefings extend the existing raw-HTTP AI integration and use the workspace quota category; this preserves shared atomic accounting without introducing a new database kind or automatic paid requests.
 - Public lead submission uses a dedicated validated server function and a service-role-only table; anonymous visitors cannot read submissions or access dashboard data.
+- GameHub uses a curated browser-safe catalog, authenticated dashboard route and explicit external-link confirmation; no embeds, arbitrary URLs or native commands, so game publishers never receive app sessions or imply native enforcement.

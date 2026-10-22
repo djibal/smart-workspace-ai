@@ -15,7 +15,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu, LogOut, MonitorSmartphone } from "lucide-react";
+import { Shield, ShieldAlert, LayoutGrid, Sparkle, Cpu, LogOut, MonitorSmartphone, Gamepad2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -121,6 +121,7 @@ const NAV = [
   { to: "/threats", label: "Threat Intelligence", short: "Threats", icon: ShieldAlert },
   { to: "/workspace", label: "Workspace", short: "Workspace", icon: Sparkle },
   { to: "/resources", label: "Resources", short: "Resources", icon: Cpu },
+  { to: "/gamehub", label: "GameHub", short: "GameHub", icon: Gamepad2 },
   { to: "/platforms", label: "Platforms & Roadmap", short: "Platforms", icon: MonitorSmartphone },
 ] as const;
 
@@ -219,17 +220,18 @@ function RootComponent() {
         </div>
       </div>
       {/* Mobile bottom navigation */}
-      <nav aria-label="Main navigation (mobile)" className="safe-bottom fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card/95 backdrop-blur md:hidden">
+      <nav aria-label="Main navigation (mobile)" className="safe-bottom fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t bg-card/95 backdrop-blur md:hidden">
         {NAV.map((n) => (
           <Link
             key={n.to}
             to={n.to}
             activeOptions={{ exact: true }}
-            className="flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[11px] text-muted-foreground"
+            title={n.label}
+            className="flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] text-muted-foreground"
             activeProps={{ className: "text-primary", "aria-current": "page" }}
           >
             <n.icon className="h-5 w-5" aria-hidden="true" />
-            <span className="truncate">{n.short}</span>
+            <span className="max-w-full truncate">{n.short}</span>
           </Link>
         ))}
       </nav>
