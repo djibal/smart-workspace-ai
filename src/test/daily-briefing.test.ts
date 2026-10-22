@@ -12,7 +12,7 @@ describe("Daily briefing boundaries", () => {
   });
   it("requires one to three structured priorities", () => {
     const priority = { category: "security", title: "Review", observation: "Sample risk", suggestion: "Review permissions" };
-    expect(parseAiResult("briefing", JSON.stringify({ summary: "Sample data", priorities: [priority] }))?.priorities).toHaveLength(1);
+    expect(parseAiResult("briefing", JSON.stringify({ summary: "Sample data", priorities: [priority] }))?.["priorities"]).toHaveLength(1);
     expect(parseAiResult("briefing", JSON.stringify({ summary: "Sample data", priorities: [] }))).toBeNull();
     expect(parseAiResult("briefing", JSON.stringify({ summary: "Sample data", priorities: Array(4).fill(priority) }))).toBeNull();
   });
