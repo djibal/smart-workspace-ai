@@ -156,10 +156,10 @@ function RootComponent() {
     document.getElementById("main")?.focus({ preventScroll: true });
   }, [path]);
 
-  if (path === "/auth") {
+  if (path === "/auth" || path === "/leads" || path === "/leads/") {
     return (
       <QueryClientProvider client={queryClient}>
-        <main className="mx-auto max-w-6xl p-6"><Outlet /></main>
+        <main id="main" tabIndex={-1} className="mx-auto max-w-6xl px-4 py-6 sm:p-6"><Outlet /></main>
         <Toaster theme="dark" />
       </QueryClientProvider>
     );

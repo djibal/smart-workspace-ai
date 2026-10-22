@@ -15,6 +15,13 @@
       "when": 1792102406691,
       "tag": "0001_ai_quota_lockdown",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792636302974,
+      "tag": "0002_create_lead_submissions",
+      "breakpoints": true
     }
   ]
 }
