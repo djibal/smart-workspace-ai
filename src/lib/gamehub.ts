@@ -20,3 +20,21 @@ export function approvedDestination(url: string): boolean {
   return [...GAMES, ...MOBILE_DESTINATIONS].some((entry) => entry.url === url && new URL(url).protocol === "https:");
 }
 export const GAMEHUB_NOTICE = "Security demonstrations elsewhere use sample data. GameHub links open real third-party websites; AegisDesk does not isolate, scan, block or limit games on your device.";
+export type CustomGameUrlResult = { ok: true; url: string; host: string } | { ok: false; error: string };
+const PRIVATE_HOST = /^(localhost|.*\.localhost|.*\.local|.*\.internal|.*\.home\.arpa)$/i;
+const IP_HOST = /^(\d{1,3}(\.\d{1,3}){3}|\[.*\])$/;
+
+// Validates a visitor-entered game link before it is shown in the sandboxed player.
+export function parseCustomGameUrl(input: string, appHost?: string): CustomGameUrlResult {
+  const raw = input.trim();
+  if (!raw) return { ok: false, error: "Enter a game link." };
+  if (raw.length > 2048) return { ok: false, error: "That link is too long." };
+  let url: URL;
+  try { url = new URL(raw); } catch { return { ok: false, error: "Enter a full link starting with https://" }; }
+  if (url.protocol !== "https:") return { ok: false, error: "Only secure links starting with https:// can be played." };
+  if (url.username || url.password) return { ok: false, error: "Links containing sign-in details are not allowed." };
+  const host = url.hostname.toLowerCase();
+  if (!host.includes(".") || PRIVATE_HOST.test(host) || IP_HOST.test(host)) return { ok: false, error: "Use a public website address, not a local or numeric address." };
+  if (appHost && host === appHost.toLowerCase()) return { ok: false, error: "AegisDesk pages cannot be opened as games." };
+  return { ok: true, url: url.href, host };
+}
