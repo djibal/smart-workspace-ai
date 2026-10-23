@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, ExternalLink, Gamepad2, LockKeyhole, Search, Smartphone, X } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Gamepad2, Link2, LockKeyhole, Play, Search, Smartphone, X } from "lucide-react";
 import { PageHeader } from "@/components/aegis";
 import { DashboardState, dashboardPage } from "@/components/dashboard-state";
 import { GameArt } from "@/components/game-art";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { approvedDestination, filterGames, GAMEHUB_NOTICE, GAMES, MOBILE_DESTINATIONS } from "@/lib/gamehub";
+import { approvedDestination, filterGames, GAMEHUB_NOTICE, GAMES, MOBILE_DESTINATIONS, parseCustomGameUrl } from "@/lib/gamehub";
 
 const SUBTITLE = "Browser games and official mobile destinations.";
 export const Route = createFileRoute("/_authenticated/gamehub")({
@@ -49,6 +49,7 @@ function GameHub() {
         </article>)}
       </div>}
     </section>
+    <CustomGame />
     <section aria-labelledby="mobile-destinations" className="mt-8 border-t pt-6">
       <div className="mb-4 flex items-center gap-2"><Smartphone aria-hidden="true" className="h-5 w-5 text-primary" /><h2 id="mobile-destinations" className="text-lg font-semibold">Official mobile destinations</h2></div>
       <div className="grid gap-4 sm:grid-cols-2">{MOBILE_DESTINATIONS.map((entry) => <article key={entry.id} className="panel flex min-w-0 flex-col gap-3 p-5"><h3 className="font-semibold">{entry.name}</h3><p className="flex-1 text-sm text-muted-foreground">{entry.description}</p><Button variant="outline" className="min-h-11 self-start" onClick={(event) => { launchButton.current = event.currentTarget; setDestination(entry); }}>Visit official site<ExternalLink aria-hidden="true" /></Button></article>)}</div>
@@ -66,4 +67,37 @@ function GameHub() {
       </DialogContent>
     </Dialog>
   </>;
+}
+
+function CustomGame() {
+  const [input, setInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [game, setGame] = useState<{ url: string; host: string } | null>(null);
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const result = parseCustomGameUrl(input, window.location.hostname);
+    if (!result.ok) { setError(result.error); return; }
+    setError(null); setGame({ url: result.url, host: result.host });
+  };
+  return <section aria-labelledby="custom-game" className="mt-8 border-t pt-6">
+    <div className="mb-2 flex items-center gap-2"><Link2 aria-hidden="true" className="h-5 w-5 text-primary" /><h2 id="custom-game" className="text-lg font-semibold">Play your own game link</h2></div>
+    <p className="mb-4 text-sm text-muted-foreground">Paste a secure (https://) link to a browser game to play it inside AegisDesk. Links are not saved.</p>
+    <form onSubmit={submit} noValidate className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex-1"><label htmlFor="custom-game-url" className="sr-only">Game link</label><Input id="custom-game-url" type="url" inputMode="url" autoComplete="off" spellCheck={false} placeholder="https://example.com/game" value={input} onChange={(e) => setInput(e.target.value)} aria-invalid={error ? true : undefined} aria-describedby={error ? "custom-game-error" : undefined} className="h-11" /></div>
+      <Button type="submit" className="min-h-11"><Play aria-hidden="true" />Play here</Button>
+    </form>
+    {error && <p id="custom-game-error" role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
+    {game && <div className="panel mt-4 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
+        <p className="min-w-0 truncate font-mono text-xs" title={game.url}>{game.host}</p>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm" className="min-h-11"><a href={game.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">New tab<ExternalLink aria-hidden="true" /></a></Button>
+          <Button variant="ghost" size="sm" className="min-h-11" onClick={() => setGame(null)}><X aria-hidden="true" />Close game</Button>
+        </div>
+      </div>
+      <iframe key={game.url} title={`Game from ${game.host}`} src={game.url} className="block aspect-[4/3] max-h-[75dvh] w-full bg-background"
+        sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms" allow="fullscreen; gamepad; autoplay" referrerPolicy="no-referrer" loading="lazy" />
+      <p className="border-t p-3 text-xs text-warning">This game comes from {game.host}, not AegisDesk. It runs in a restricted frame without access to your AegisDesk account, camera, microphone or pop-ups, but no processor or memory limits apply. If it stays blank, the site does not allow being played inside other apps — use "New tab".</p>
+    </div>}
+  </section>;
 }

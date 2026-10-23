@@ -22,3 +22,16 @@ describe("GameHub catalog", () => {
     expect(approvedDestination("https://lichess.org/?redirect=evil")).toBe(false);
   });
 });
+
+import { parseCustomGameUrl } from "@/lib/gamehub";
+describe("custom game links", () => {
+  it("accepts public https links", () => {
+    expect(parseCustomGameUrl("  https://example.com/game  ")).toEqual({ ok: true, url: "https://example.com/game", host: "example.com" });
+  });
+  it.each(["http://example.com", "javascript:alert(1)", "data:text/html,hi", "https://user:pw@example.com", "https://localhost:3000", "https://192.168.1.1", "https://printer.local", "example.com", ""])("rejects %s", (v) => {
+    expect(parseCustomGameUrl(v).ok).toBe(false);
+  });
+  it("rejects the app's own host", () => {
+    expect(parseCustomGameUrl("https://aegis.example.com/x", "aegis.example.com").ok).toBe(false);
+  });
+});
