@@ -49,6 +49,7 @@ function GameHub() {
         </article>)}
       </div>}
     </section>
+    <CustomGame />
     <section aria-labelledby="mobile-destinations" className="mt-8 border-t pt-6">
       <div className="mb-4 flex items-center gap-2"><Smartphone aria-hidden="true" className="h-5 w-5 text-primary" /><h2 id="mobile-destinations" className="text-lg font-semibold">Official mobile destinations</h2></div>
       <div className="grid gap-4 sm:grid-cols-2">{MOBILE_DESTINATIONS.map((entry) => <article key={entry.id} className="panel flex min-w-0 flex-col gap-3 p-5"><h3 className="font-semibold">{entry.name}</h3><p className="flex-1 text-sm text-muted-foreground">{entry.description}</p><Button variant="outline" className="min-h-11 self-start" onClick={(event) => { launchButton.current = event.currentTarget; setDestination(entry); }}>Visit official site<ExternalLink aria-hidden="true" /></Button></article>)}</div>
